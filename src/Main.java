@@ -5,6 +5,10 @@
 public class Main {
 
 	public static void main(String[] args) {
-		GuiForm guiForm = new GuiForm();
+		SelectDevice selectDevice = new SelectDevice();
+        String device = selectDevice.getSelectDevice();
+        GenerateIPPacket.setMacAddress(selectDevice.getMacAddress());
+        GenerateIPPacket.setSelectedDevice(device);
+        GuiForm guiForm = new GuiForm();
 	}
 }
