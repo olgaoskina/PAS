@@ -41,7 +41,7 @@
                       <text value="Data"/>
                     </properties>
                   </component>
-                  <component id="ce03f" class="javax.swing.JTextField" binding="textFieldTCPData">
+                  <component id="ce03f" class="javax.swing.JTextField" binding="textFieldTCPData" custom-create="true">
                     <constraints>
                       <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                         <preferred-size width="150" height="-1"/>
@@ -59,7 +59,7 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="2b282" binding="panelTCPLeft" layout-manager="GridLayoutManager" row-count="4" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                  <grid id="2b282" binding="panelTCPLeft" layout-manager="GridLayoutManager" row-count="5" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
                     <margin top="0" left="0" bottom="0" right="0"/>
                     <constraints>
                       <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -75,7 +75,7 @@
                           <text value="Header Lenght"/>
                         </properties>
                       </component>
-                      <component id="5fb27" class="javax.swing.JTextField" binding="textFieldTCPHeaderLenght">
+                      <component id="5fb27" class="javax.swing.JTextField" binding="textFieldTCPHeaderLenght" custom-create="true">
                         <constraints>
                           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
@@ -91,7 +91,7 @@
                           <text value="Source Port"/>
                         </properties>
                       </component>
-                      <component id="d201d" class="javax.swing.JTextField" binding="textFieldTCPSourcePort">
+                      <component id="d201d" class="javax.swing.JTextField" binding="textFieldTCPSourcePort" custom-create="true">
                         <constraints>
                           <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
@@ -107,7 +107,7 @@
                           <text value="Destination Port"/>
                         </properties>
                       </component>
-                      <component id="6340f" class="javax.swing.JTextField" binding="textFieldTCPDestinationPort">
+                      <component id="6340f" class="javax.swing.JTextField" binding="textFieldTCPDestinationPort" custom-create="true">
                         <constraints>
                           <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
@@ -123,9 +123,25 @@
                           <text value="CheckSum"/>
                         </properties>
                       </component>
-                      <component id="e33c4" class="javax.swing.JTextField" binding="textFieldTCPSheckSum">
+                      <component id="e33c4" class="javax.swing.JTextField" binding="textFieldTCPCheckSum" custom-create="true">
                         <constraints>
                           <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                            <preferred-size width="150" height="-1"/>
+                          </grid>
+                        </constraints>
+                        <properties/>
+                      </component>
+                      <component id="95116" class="javax.swing.JLabel" binding="labelTCPUrgentPointer">
+                        <constraints>
+                          <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                        </constraints>
+                        <properties>
+                          <text value="Urgent Pointer"/>
+                        </properties>
+                      </component>
+                      <component id="934cb" class="javax.swing.JTextField" binding="textFieldTCPUrgentPointer" custom-create="true">
+                        <constraints>
+                          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                             <preferred-size width="150" height="-1"/>
                           </grid>
                         </constraints>
@@ -151,7 +167,7 @@
                         <children>
                           <component id="8e2ad" class="javax.swing.JLabel" binding="labelTCPFlags">
                             <constraints>
-                              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>
                             <properties>
                               <text value="Flags"/>
@@ -165,7 +181,7 @@
                               <text value="SYN"/>
                             </properties>
                           </component>
-                          <component id="7e32f" class="javax.swing.JCheckBox" binding="CheckBoxTCPFlagsACK">
+                          <component id="7e32f" class="javax.swing.JCheckBox" binding="checkBoxTCPFlagsACK">
                             <constraints>
                               <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -189,7 +205,7 @@
                               <text value="RST"/>
                             </properties>
                           </component>
-                          <component id="e4c04" class="javax.swing.JCheckBox" binding="checkBoxTCPFlagsPUSH">
+                          <component id="e4c04" class="javax.swing.JCheckBox" binding="checkBoxTCPFlagsPSH">
                             <constraints>
                               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                             </constraints>
@@ -223,14 +239,6 @@
                               <text value="SEQ"/>
                             </properties>
                           </component>
-                          <component id="f7b2a" class="javax.swing.JTextArea" binding="textAreaTCPSeq">
-                            <constraints>
-                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                                <preferred-size width="150" height="50"/>
-                              </grid>
-                            </constraints>
-                            <properties/>
-                          </component>
                           <component id="be0ec" class="javax.swing.JLabel" binding="labelTCPAck">
                             <constraints>
                               <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -239,7 +247,7 @@
                               <text value="ACK"/>
                             </properties>
                           </component>
-                          <component id="bac80" class="javax.swing.JTextField" binding="textFieldTCPAck">
+                          <component id="bac80" class="javax.swing.JTextField" binding="textFieldTCPAck" custom-create="true">
                             <constraints>
                               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
@@ -255,9 +263,17 @@
                               <text value="WIN"/>
                             </properties>
                           </component>
-                          <component id="c9a3e" class="javax.swing.JTextField" binding="textFieldTCPWin">
+                          <component id="c9a3e" class="javax.swing.JTextField" binding="textFieldTCPWin" custom-create="true">
                             <constraints>
                               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                                <preferred-size width="150" height="-1"/>
+                              </grid>
+                            </constraints>
+                            <properties/>
+                          </component>
+                          <component id="4b340" class="javax.swing.JTextField" binding="textFieldTCPSeq" custom-create="true">
+                            <constraints>
+                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                 <preferred-size width="150" height="-1"/>
                               </grid>
                             </constraints>
@@ -699,7 +715,7 @@
               <text value="Offset"/>
             </properties>
           </component>
-          <component id="2bf88" class="javax.swing.JTextField" binding="textFieldOffset">
+          <component id="2bf88" class="javax.swing.JTextField" binding="textFieldOffset" custom-create="true">
             <constraints>
               <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -715,7 +731,7 @@
               <text value="Header CheckSum"/>
             </properties>
           </component>
-          <component id="b626f" class="javax.swing.JTextField" binding="textFieldHeaderCheckSum">
+          <component id="b626f" class="javax.swing.JTextField" binding="textFieldHeaderCheckSum" custom-create="true">
             <constraints>
               <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -731,7 +747,7 @@
               <text value="ID"/>
             </properties>
           </component>
-          <component id="d89ee" class="javax.swing.JTextField" binding="textFieldID">
+          <component id="d89ee" class="javax.swing.JTextField" binding="textFieldID" custom-create="true">
             <constraints>
               <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -747,7 +763,7 @@
               <text value="TTL"/>
             </properties>
           </component>
-          <component id="f29a1" class="javax.swing.JTextField" binding="textFieldTTL">
+          <component id="f29a1" class="javax.swing.JTextField" binding="textFieldTTL" custom-create="true">
             <constraints>
               <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                 <preferred-size width="150" height="-1"/>
@@ -781,7 +797,7 @@
                   <text value="Precedence"/>
                 </properties>
               </component>
-              <component id="9011e" class="javax.swing.JTextField" binding="textFieldTypePrecedence">
+              <component id="9011e" class="javax.swing.JTextField" binding="textFieldTypePrecedence" custom-create="true">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -807,7 +823,7 @@
                   <text value="D"/>
                 </properties>
               </component>
-              <component id="76c25" class="javax.swing.JTextField" binding="textFieldTypeD">
+              <component id="76c25" class="javax.swing.JTextField" binding="textFieldTypeD" custom-create="true">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -823,7 +839,7 @@
                   <text value="ECN"/>
                 </properties>
               </component>
-              <component id="3d4a1" class="javax.swing.JTextField" binding="textFieldTypeECN">
+              <component id="3d4a1" class="javax.swing.JTextField" binding="textFieldTypeECN" custom-create="true">
                 <constraints>
                   <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -839,7 +855,7 @@
                   <text value="T"/>
                 </properties>
               </component>
-              <component id="d6f57" class="javax.swing.JTextField" binding="textFieldTypeT">
+              <component id="d6f57" class="javax.swing.JTextField" binding="textFieldTypeT" custom-create="true">
                 <constraints>
                   <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -855,7 +871,7 @@
                   <text value="R"/>
                 </properties>
               </component>
-              <component id="62ad2" class="javax.swing.JTextField" binding="textFieldTypeR">
+              <component id="62ad2" class="javax.swing.JTextField" binding="textFieldTypeR" custom-create="true">
                 <constraints>
                   <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>

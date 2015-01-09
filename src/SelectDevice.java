@@ -1,18 +1,14 @@
-import org.jnetpcap.PcapIf;
-
 import javax.swing.*;
-import java.io.IOException;
-import java.util.List;
 
 public class SelectDevice {
     private JPanel panel;
     private String selectDevice;
-    private List<PcapIf> allDevices;
+//    private List<PcapIf> allDevices;
     private byte[] MAC_ADDRESS;
 
     public SelectDevice() {
         panel = new JPanel();
-        allDevices= new FindDevice().findAllDevices();
+//        allDevices= new FindDevice().findAllDevices();
         createWindow();
         showWindow();
         closeWindow();
@@ -22,9 +18,9 @@ public class SelectDevice {
         panel.add(new JLabel("Please select a device:"));
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
 
-        for (PcapIf device: allDevices) {
-            model.addElement(device.getName());
-        }
+//        for (PcapIf device: allDevices) {
+//            model.addElement(device.getName());
+//        }
         JComboBox comboBox = new JComboBox<String>(model);
         panel.add(comboBox);
 
@@ -32,11 +28,11 @@ public class SelectDevice {
         if (result == JOptionPane.OK_OPTION) {
             selectDevice = (String) comboBox.getSelectedItem();
 
-            try {
-                MAC_ADDRESS = allDevices.get(comboBox.getSelectedIndex()).getHardwareAddress();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                MAC_ADDRESS = allDevices.get(comboBox.getSelectedIndex()).getHardwareAddress();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
 
     }
