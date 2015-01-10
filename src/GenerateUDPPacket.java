@@ -26,7 +26,7 @@ public class GenerateUDPPacket extends GenerateIPPacket {
     private int UDP_DESTINATION_PORT = 0;
     private int UDP_CHECKSUM = 0;
     private byte[] UDP_DATA;
-    private boolean UDP_NEED_CALCULATE_CHECK_SUM = false;
+    protected boolean UDP_NEED_CALCULATE_CHECK_SUM = false;
     private UDPPacket udpPacket;
 
     public UDPPacket getUdpPacket() {
@@ -163,7 +163,7 @@ public class GenerateUDPPacket extends GenerateIPPacket {
         this.UDP_DATA = UDP_DATA;
     }
 
-    public void setUDPCalculateCheckSum(boolean needCalculate) {
+    public void setNeedUDPCalculateCheckSum(boolean needCalculate) {
         this.UDP_NEED_CALCULATE_CHECK_SUM = needCalculate;
     }
 }

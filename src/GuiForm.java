@@ -1,3 +1,4 @@
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.savarese.vserv.tcpip.ICMPEchoPacket;
 import org.savarese.vserv.tcpip.TCPPacket;
 import org.savarese.vserv.tcpip.UDPPacket;
@@ -490,7 +491,7 @@ public class GuiForm extends JFrame {
         generateUDPPacket.setUDPDestinationPort(udpDestinationPort);
         generateUDPPacket.setUDPLength(udpLength);
         generateUDPPacket.setUDPCheckSum(udpChecksum);
-        generateUDPPacket.setUDPCalculateCheckSum(udpNeedCalculateCheckSum);
+        generateUDPPacket.setNeedUDPCalculateCheckSum(udpNeedCalculateCheckSum);
 
         generateUDPPacket.setUDPData(tcpData);
         generateUDPPacket.generate();
@@ -572,7 +573,7 @@ public class GuiForm extends JFrame {
         generateICMPPacket.setDestinationAddress(destinationIP);
 
         generateICMPPacket.setICMPCheckSum(icmpChecksum);
-        generateICMPPacket.setICMPCalculateCheckSum(icmpNeedCalculateCheckSum);
+        generateICMPPacket.setNeedICMPCalculateCheckSum(icmpNeedCalculateCheckSum);
         generateICMPPacket.setICMPCode(icmpCode);
         generateICMPPacket.setICMPID(icmpID);
         generateICMPPacket.setICMPSeqNumber(icmpSeqNumber);
@@ -605,6 +606,30 @@ public class GuiForm extends JFrame {
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
                 fileChooser.showOpenDialog(null);
                 File selectedFile = fileChooser.getSelectedFile();
+
+                BufferedReader bufferedReader = null;
+                boolean needIp = false;
+                boolean needTcp = false;
+                try {
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                    needTcp = Boolean.parseBoolean(bufferedReader.readLine());
+
+                    System.out.println("[NEED IP]: " + needIp);
+                    System.out.println("[NEED TCP]: " + needTcp);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (bufferedReader != null) {
+                            bufferedReader.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(selectedFile);
@@ -621,6 +646,12 @@ public class GuiForm extends JFrame {
                     tcpPacket.setData(byteBuffer);
                     generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
                     updateIpAndTcpFields();
+                    if (needTcp) {
+                        textFieldTCPCheckSum.setText("a");
+                    }
+                    if (needIp) {
+                        textFieldHeaderCheckSum.setText("a");
+                    }
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
@@ -643,12 +674,13 @@ public class GuiForm extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 FileOutputStream fos = null;
-                GenerateTCPPacket generateTCPPacket = readIpAndTcpParametersAndGeneratePacket();
+                GenerateTCPPacket generateTCPPacket1 = readIpAndTcpParametersAndGeneratePacket();
 
-                byte[] buffer = new byte[generateTCPPacket.getTcpPacket().size()];
-                generateTCPPacket.getTcpPacket().getData(buffer);
+                byte[] buffer = new byte[generateTCPPacket1.getTcpPacket().size()];
+                generateTCPPacket1.getTcpPacket().getData(buffer);
+                String time = String.valueOf(System.currentTimeMillis());
                 try {
-                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".tcp");
+                    fos = new FileOutputStream(time + ".tcp");
                     fos.write(buffer);
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
@@ -658,6 +690,26 @@ public class GuiForm extends JFrame {
                     try {
                         if (fos != null) {
                             fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                OutputStreamWriter outputStreamWriter = null;
+                try {
+                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".tcp.time"));
+                    outputStreamWriter.write("" + generateTCPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                    outputStreamWriter.write("" + generateTCPPacket1.TCP_NEED_CALCULATE_CHECK_SUM);
+
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (outputStreamWriter != null) {
+                            outputStreamWriter.close();
                         }
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -782,7 +834,7 @@ public class GuiForm extends JFrame {
         textFieldICMPSequence.setText(String.valueOf(icmpEchoPacket.getSequenceNumber()));
         textFieldICMPCheckSum.setText(String.valueOf(icmpEchoPacket.getICMPChecksum()));
         textFieldICMPCode.setText(String.valueOf(icmpEchoPacket.getCode()));
-        comboBoxICMPType.setSelectedIndex(icmpEchoPacket.getType() == 0 ? 1 : 2);
+        comboBoxICMPType.setSelectedIndex(icmpEchoPacket.getType() == 0 ? 0 : 1);
         textFieldICMPID.setText(String.valueOf(icmpEchoPacket.getIdentifier()));
 //        textFieldTCPData.setText(Arrays.toString(icmpEchoPacket.getT));
 
@@ -815,6 +867,30 @@ public class GuiForm extends JFrame {
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
                 fileChooser.showOpenDialog(null);
                 File selectedFile = fileChooser.getSelectedFile();
+
+                BufferedReader bufferedReader = null;
+                boolean needIp = false;
+                boolean needUdp = false;
+                try {
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                    needUdp = Boolean.parseBoolean(bufferedReader.readLine());
+
+                    System.out.println("[NEED IP]: " + needIp);
+                    System.out.println("[NEED UDP]: " + needUdp);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (bufferedReader != null) {
+                            bufferedReader.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(selectedFile);
@@ -831,6 +907,12 @@ public class GuiForm extends JFrame {
                     udpPacket.setData(byteBuffer);
                     generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
                     updateIpAndUdpFields();
+                    if (needUdp) {
+                        textFieldUDPCheckSum.setText("a");
+                    }
+                    if (needIp) {
+                        textFieldHeaderCheckSum.setText("a");
+                    }
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
@@ -857,8 +939,9 @@ public class GuiForm extends JFrame {
 
                 byte[] buffer = new byte[generateUDPPacket1.getUdpPacket().size()];
                 generateUDPPacket1.getUdpPacket().getData(buffer);
+                String time = String.valueOf(System.currentTimeMillis());
                 try {
-                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".udp");
+                    fos = new FileOutputStream(String.valueOf(time) + ".udp");
                     fos.write(buffer);
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
@@ -868,6 +951,26 @@ public class GuiForm extends JFrame {
                     try {
                         if (fos != null) {
                             fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                OutputStreamWriter outputStreamWriter = null;
+                try {
+                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".udp.time"));
+                    outputStreamWriter.write("" + generateUDPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                    outputStreamWriter.write("" + generateUDPPacket1.UDP_NEED_CALCULATE_CHECK_SUM);
+
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (outputStreamWriter != null) {
+                            outputStreamWriter.close();
                         }
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -897,6 +1000,32 @@ public class GuiForm extends JFrame {
                 fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
                 fileChooser.showOpenDialog(null);
                 File selectedFile = fileChooser.getSelectedFile();
+
+                BufferedReader bufferedReader = null;
+                boolean needIp = false;
+                boolean needIcmp = false;
+                try {
+                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                    needIcmp = Boolean.parseBoolean(bufferedReader.readLine());
+
+                    System.out.println("[NEED IP]: " + needIp);
+                    System.out.println("[NEED ICMP]: " + needIcmp);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (bufferedReader != null) {
+                            bufferedReader.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+
                 FileInputStream fis = null;
                 try {
                     fis = new FileInputStream(selectedFile);
@@ -913,6 +1042,12 @@ public class GuiForm extends JFrame {
                     icmpEchoPacket.setData(byteBuffer);
                     generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
                     updateIpAndIcmpFields();
+                    if (needIcmp) {
+                        textFieldICMPCheckSum.setText("a");
+                    }
+                    if (needIp) {
+                        textFieldHeaderCheckSum.setText("a");
+                    }
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 } catch (IOException e1) {
@@ -939,8 +1074,9 @@ public class GuiForm extends JFrame {
 
                 byte[] buffer = new byte[generateICMPPacket1.getIcmpEchoPacket().size()];
                 generateICMPPacket1.getIcmpEchoPacket().getData(buffer);
+                String time = String.valueOf(System.currentTimeMillis());
                 try {
-                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".icmp");
+                    fos = new FileOutputStream(time + ".icmp");
                     fos.write(buffer);
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
@@ -950,6 +1086,26 @@ public class GuiForm extends JFrame {
                     try {
                         if (fos != null) {
                             fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+                OutputStreamWriter outputStreamWriter = null;
+                try {
+                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".icmp.time"));
+                    outputStreamWriter.write("" + generateICMPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                    outputStreamWriter.write("" + generateICMPPacket1.ICMP_NEED_CALCULATE_CHECK_SUM);
+
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (outputStreamWriter != null) {
+                            outputStreamWriter.close();
                         }
                     } catch (IOException e1) {
                         e1.printStackTrace();

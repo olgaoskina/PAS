@@ -28,7 +28,7 @@ public class GenerateICMPPacket extends GenerateIPPacket {
     private int ICMP_SEQ_NUMBER = 0;
     private int ICMP_CHECKSUM = 0;
     private byte[] ICMP_DATA;
-    private boolean ICMP_NEED_CALCULATE_CHECK_SUM = false;
+    protected boolean ICMP_NEED_CALCULATE_CHECK_SUM = false;
     private ICMPEchoPacket icmpEchoPacket;
 
     public ICMPEchoPacket getIcmpEchoPacket() {
@@ -170,7 +170,7 @@ public class GenerateICMPPacket extends GenerateIPPacket {
         this.ICMP_DATA = ICMP_DATA;
     }
 
-    public void setICMPCalculateCheckSum(boolean needCalculate) {
+    public void setNeedICMPCalculateCheckSum(boolean needCalculate) {
         this.ICMP_NEED_CALCULATE_CHECK_SUM = needCalculate;
         System.out.println("[SET ICMP_NEED_CALCULATE_CHECK_SUM]:" + ICMP_NEED_CALCULATE_CHECK_SUM);
     }
