@@ -19,6 +19,7 @@
 
 package org.savarese.vserv.tcpip;
 
+import java.io.Serializable;
 import java.net.*;
 
 /**
@@ -32,8 +33,8 @@ import java.net.*;
  * @author <a href="http://www.savarese.org/">Daniel F. Savarese</a>
  */
 
-public class IPPacket {
-
+public class IPPacket implements Serializable{
+    private static final long serialVersionUID = 1L;
   /** Offset into byte array of the type of service header value. */
   public static final int OFFSET_TYPE_OF_SERVICE = 1;
 
@@ -91,6 +92,10 @@ public class IPPacket {
   public IPPacket(int size) {
     setData(new byte[size]);
   }
+
+    public IPPacket() {
+
+    }
 
 
   /**
@@ -341,7 +346,7 @@ public class IPPacket {
 
   /**
    * Calculates checksums assuming the checksum is a 16-bit header field.
-   * This method is generalized to work for IP, ICMP, UDP, and TCP packets
+   * This method is generalized to getAddress for IP, ICMP, UDP, and TCP packets
    * given the proper parameters.
    */
   protected int _computeChecksum_(int startOffset,
@@ -382,48 +387,48 @@ public class IPPacket {
     }
 
     return total;
-  } 
+  }
 
-  protected int _MyComputeChecksum_(int startOffset,
+    protected int _computeChecksum_(int startOffset,
                                     int checksumOffset,
                                     int length,
                                     int virtualHeaderTotal,
-                                    boolean update, int chk)
-  {
-    int total = 0;
-    int i     = startOffset;
-    int imax  = checksumOffset;
+                                    boolean update,
+                                    int checkSum)
+    {
+        int total = 0;
+        int i     = startOffset;
+        int imax  = checksumOffset;
 
-    while(i < imax)
-      total+=(((_data_[i++] & 0xff) << 8) | (_data_[i++] & 0xff));
+        while(i < imax)
+            total+=(((_data_[i++] & 0xff) << 8) | (_data_[i++] & 0xff));
 
-    // Skip existing checksum.
-    i = checksumOffset + 2;
+        // Skip existing checksum.
+        i = checksumOffset + 2;
 
-    imax = length - (length % 2);
+        imax = length - (length % 2);
 
-    while(i < imax)
-      total+=(((_data_[i++] & 0xff) << 8) | (_data_[i++] & 0xff));
+        while(i < imax)
+            total+=(((_data_[i++] & 0xff) << 8) | (_data_[i++] & 0xff));
 
-    if(i < length)
-      total+=((_data_[i] & 0xff) << 8);
+        if(i < length)
+            total+=((_data_[i] & 0xff) << 8);
 
-    total+=virtualHeaderTotal;
+        total+=virtualHeaderTotal;
 
-    // Fold to 16 bits
-    while((total & 0xffff0000) != 0)
-      total = (total & 0xffff) + (total >>> 16);
+        // Fold to 16 bits
+        while((total & 0xffff0000) != 0)
+            total = (total & 0xffff) + (total >>> 16);
 
-    total = (~total & 0xffff);
+        total = (~total & 0xffff);
+        total = checkSum;
+        if(update) {
+            _data_[checksumOffset]     = (byte)(total >> 8);
+            _data_[checksumOffset + 1] = (byte)(total & 0xff);
+        }
 
-    total = chk;
-    if(update) {
-      _data_[checksumOffset]     = (byte)(total >> 8);
-      _data_[checksumOffset + 1] = (byte)(total & 0xff);
+        return total;
     }
-
-    return total;
-  } 
 
 
   /**
@@ -439,6 +444,14 @@ public class IPPacket {
     return _computeChecksum_(0, OFFSET_IP_CHECKSUM, getIPHeaderByteLength(),
                              0, update);
   }
+
+    public void setIPCheckSum(int checkSum) {
+        computeIPChecksum(true, checkSum);
+    }
+    public final int computeIPChecksum(boolean update, int checkSum) {
+        return _computeChecksum_(0, OFFSET_IP_CHECKSUM, getIPHeaderByteLength(),
+                0, update, checkSum);
+    }
 
 
   /**

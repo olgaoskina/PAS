@@ -240,6 +240,12 @@ public class UDPPacket extends IPPacket {
                              update);
   }
 
+    public final void setUDPCheckSum(int checkSum) {
+        _computeChecksum_(__offset, __offset + OFFSET_UDP_CHECKSUM,
+                getIPPacketLength(), __getVirtualHeaderTotal(),
+                true, checkSum);
+    }
+
 
   /**
    * Same as <code>computeUDPChecksum(true);</code>

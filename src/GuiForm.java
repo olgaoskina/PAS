@@ -1,5 +1,6 @@
-import org.savarese.vserv.tcpip.IPPacket;
+import org.savarese.vserv.tcpip.ICMPEchoPacket;
 import org.savarese.vserv.tcpip.TCPPacket;
+import org.savarese.vserv.tcpip.UDPPacket;
 
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -9,9 +10,11 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 /**
  * Created by olgaoskina
@@ -73,26 +76,22 @@ public class GuiForm extends JFrame {
 	private JPanel panelICMPBottom;
 	private JLabel labelICMPData;
 	private JPanel panelTCPButtons;
-	private JButton buttonTCPSafe;
+	private JButton buttonTCPSave;
 	private JButton buttonTCPSend;
 	private JButton buttonTCPCansel;
 	private JLabel labelUICMPType;
 	private JComboBox comboBoxICMPType;
 	private JLabel labelICMPCode;
 	private JTextField textFieldICMPCode;
-	private JLabel labelCheckSum;
-	private JTextField textFieldCheckSum;
+	private JLabel labelICMPCheckSum;
+	private JTextField textFieldICMPCheckSum;
 	private JLabel labelICMPID;
 	private JTextField textFieldICMPID;
 	private JLabel labelICMPSequence;
 	private JTextField textFieldICMPSequence;
-	private JLabel labelICMPHeaderLenght;
-	private JTextField textFieldICMPHeaderLenght;
-	private JLabel labelICMPDataLenght;
-	private JTextField textFieldICMPDataLenght;
-	private JTextField textFieldUDPSourcePort;
+    private JTextField textFieldUDPSourcePort;
 	private JTextField textFieldUDPDestinationPort;
-	private JTextField textFieldUDPHeaderLenght;
+	private JTextField textFieldUDPLenght;
 	private JLabel labelUDPSourcePort;
 	private JLabel labelUDPDestinationPort;
 	private JLabel labelUDPHeaderLenght;
@@ -127,20 +126,44 @@ public class GuiForm extends JFrame {
 	private JLabel labelID;
 	private JTextField textFieldTTL;
 	private JLabel labelTTL;
-	private JButton buttonUDPSafe;
+	private JButton buttonUDPSave;
 	private JButton buttonUDPCansel;
 	private JButton buttonUDPSend;
 	private JPanel panelUDPButtons;
-	private JButton buttonICMPSafe;
+	private JButton buttonICMPSave;
 	private JButton buttonICMPCansel;
 	private JButton buttonICMPSend;
 	private JPanel panelICMPButtons;
 	private JTextField textFieldTCPSeq;
 	private JTextField textFieldTCPUrgentPointer;
 	private JLabel labelTCPUrgentPointer;
+    private JButton buttonTCPOpen;
+    private JCheckBox checkBoxTCPReserved1;
+    private JCheckBox checkBoxTCPReserved2;
+    private JCheckBox checkBoxTCPReserved3;
+    private JCheckBox checkBoxTCPReserved4;
+    private JCheckBox checkBoxTCPReservedCWR;
+    private JCheckBox checkBoxTCPReservedECE;
+    private JLabel labelTCPReserved;
+    private JTextField textFieldUDPCheckSum;
+    private JLabel labelUDPCheckSum;
+    private JButton buttonUDPOpen;
+    private JButton buttonICMPOpen;
 
-	public GuiForm() {
+    private GenerateTCPPacket generateTCPPacket;
+    private GenerateUDPPacket generateUDPPacket;
+    private GenerateICMPPacket generateICMPPacket;
+    
+    private TCPPacket tcpPacket;
+    private UDPPacket udpPacket;
+    private ICMPEchoPacket icmpEchoPacket;
+
+    private String DEVICE;
+
+
+    public GuiForm(String device) {
 		super("PAS");
+        DEVICE = device;
 		$$$setupUI$$$();
 		setContentPane(panelMain);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -148,6 +171,7 @@ public class GuiForm extends JFrame {
 		setVisible(true);
 		addTCPListeners();
 		addUDPListeners();
+        addICMPListeners();
 	}
 
 
@@ -157,8 +181,8 @@ public class GuiForm extends JFrame {
 
 		textFieldDestinationIP = new JTextField();
 		textFieldSourceIP = new JTextField();
-		textFieldSourceIP.setText("192.168.0.107");
-		textFieldDestinationIP.setText("8.8.8.8");
+		textFieldSourceIP.setText("192.168.0.103");
+		textFieldDestinationIP.setText("192.168.0.104");
 
 
 		try {
@@ -204,7 +228,7 @@ public class GuiForm extends JFrame {
 		textFieldHeaderCheckSum.setText("123");
 		textFieldTotalLenght.setText("200");
 		textFieldHeaderLenght.setText("12");
-		textFieldID.setText("444");
+		textFieldID.setText("55");
 		textFieldOffset.setText("0");
 		textFieldTTL.setText("23");
 
@@ -230,149 +254,712 @@ public class GuiForm extends JFrame {
 		textFieldTypeT.setText("1");
 		textFieldTypeECN.setText("1");
 		textFieldTCPHeaderLenght.setText("5");
-		textFieldTCPSourcePort.setText("123");
-		textFieldTCPDestinationPort.setText("234");
-		textFieldTCPCheckSum.setText("1");
+		textFieldTCPSourcePort.setText("444");
+		textFieldTCPDestinationPort.setText("333");
+		textFieldTCPCheckSum.setText("a");
 		textFieldTCPUrgentPointer.setText("1");
 		textFieldTCPSeq.setText("1");
 		textFieldTCPAck.setText("1");
 		textFieldTCPWin.setText("1");
-		textFieldTCPData.setText("1");
+		textFieldTCPData.setText("TCP packet");
+
+        textFieldUDPSourcePort = new JTextField();
+        textFieldUDPDestinationPort = new JTextField();
+        textFieldUDPCheckSum = new JTextField();
+        textFieldUDPLenght = new JTextField();
+        textFieldUDPData = new JTextField();
+
+        textFieldUDPSourcePort.setText("333");
+        textFieldUDPDestinationPort.setText("444");
+        textFieldUDPCheckSum.setText("a");
+        textFieldUDPLenght.setText("12");
+        textFieldUDPData.setText("UDP packet");
+
+        textFieldICMPCheckSum = new JTextField();
+        textFieldICMPCode = new JTextField();
+        textFieldICMPID = new JTextField();
+        textFieldICMPSequence = new JTextField();
+        textFieldICMPData = new JTextField();
 
 
+        textFieldICMPCheckSum.setText("a");
+        textFieldICMPCode.setText("0");
+        textFieldICMPID.setText("12");
+        textFieldICMPSequence.setText("23");
+        textFieldICMPData.setText("ICMP packet");
 	}
+
+    private GenerateTCPPacket readIpAndTcpParametersAndGeneratePacket() {
+        int version = Integer.parseInt(textFieldVersion.getText());
+        int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
+        int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
+        int tosD = Integer.parseInt(textFieldTypeD.getText());
+        int tosT = Integer.parseInt(textFieldTypeT.getText());
+        int tosR = Integer.parseInt(textFieldTypeR.getText());
+        int tosECN = Integer.parseInt(textFieldTypeECN.getText());
+        int totalLength = Integer.parseInt(textFieldTotalLenght.getText());
+        int id = Integer.parseInt(textFieldID.getText());
+        boolean flagX = checkBoxFlagsX.isSelected();
+        boolean flagD = checkBoxFlagsD.isSelected();
+        boolean flagM = checkBoxFlagsM.isSelected();
+        int offset = Integer.parseInt(textFieldOffset.getText());
+        int ttl = Integer.parseInt(textFieldTTL.getText());
+        int checkSum = 0;
+        boolean needCalculateCheckSum = false;
+        if (textFieldHeaderCheckSum.getText().matches("\\w")) {
+            needCalculateCheckSum = true;
+        } else {
+            checkSum = Integer.parseInt(textFieldHeaderCheckSum.getText());
+        }
+        byte[] sourceIP = null;
+        byte[] destinationIP = null;
+
+        try {
+
+            sourceIP = InetAddress.getByName(textFieldSourceIP.getText()).getAddress();
+
+            destinationIP = InetAddress.getByName(textFieldDestinationIP.getText()).getAddress();
+            System.out.println("[IP TEXT]: " + InetAddress.getByAddress(destinationIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+
+        int tcpSourcePort = Integer.parseInt(textFieldTCPSourcePort.getText());
+        int tcpDestinationPort = Integer.parseInt(textFieldTCPDestinationPort.getText());
+        int tcpSeq = Integer.parseInt(textFieldTCPSeq.getText());
+        int tcpWinSize = Integer.parseInt(textFieldTCPWin.getText());
+        int tcpCheckSum = 0;
+        boolean tcpNeedCalculateCheckSum = false;
+        if (textFieldTCPCheckSum.getText().matches("\\w")) {
+            tcpNeedCalculateCheckSum = true;
+        } else {
+            tcpCheckSum = Integer.parseInt(textFieldTCPCheckSum.getText());
+        }
+
+        int tcpHeaderLength = Integer.parseInt(textFieldTCPHeaderLenght.getText());
+        int tcpACK = Integer.parseInt(textFieldTCPAck.getText());
+        boolean tcpFlagSYN = checkBoxTCPFlagsSYN.isSelected();
+        boolean tcpFlagACK = checkBoxTCPFlagsACK.isSelected();
+        boolean tcpFlagFIN = checkBoxTCPFlagsFIN.isSelected();
+        boolean tcpFlagRST = checkBoxTCPFlagsRST.isSelected();
+        boolean tcpFlagPSH = checkBoxTCPFlagsPSH.isSelected();
+        boolean tcpFlagURG = checkBoxTCPFlagsURG.isSelected();
+        boolean tcpFlagCWR = checkBoxTCPReservedCWR.isSelected();
+        boolean tcpFlagECE = checkBoxTCPReservedECE.isSelected();
+        boolean tcpFlagReserved1 = checkBoxTCPReserved1.isSelected();
+        boolean tcpFlagReserved2 = checkBoxTCPReserved2.isSelected();
+        boolean tcpFlagReserved3 = checkBoxTCPReserved3.isSelected();
+        boolean tcpFlagReserved4 = checkBoxTCPReserved4.isSelected();
+        int tcpUrgentPointer = Integer.parseInt(textFieldTCPUrgentPointer.getText());
+
+        byte[] tcpData = textFieldTCPData.getText().getBytes();
+
+
+        tcpPacket = new TCPPacket(Math.max(tcpData.length + 4 * headerLength + 4 * tcpHeaderLength, totalLength));
+        generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
+
+        generateTCPPacket.setVersion(version);
+        generateTCPPacket.setHeaderLength(headerLength);
+        generateTCPPacket.setPrecedence(typePrecedence);
+        generateTCPPacket.setTosD(tosD);
+        generateTCPPacket.setTosECN(tosECN);
+        generateTCPPacket.setTosR(tosR);
+        generateTCPPacket.setTosT(tosT);
+        generateTCPPacket.setTotalLength(totalLength);
+        generateTCPPacket.setID(id);
+        generateTCPPacket.setFlagD(flagD ? 1 : 0);
+        generateTCPPacket.setFlagM(flagM ? 1 : 0);
+        generateTCPPacket.setFlagX(flagX ? 1 : 0);
+        generateTCPPacket.setOffset(offset);
+        generateTCPPacket.setTTL(ttl);
+        generateTCPPacket.setNeedCalculateTCPCheckSum(tcpNeedCalculateCheckSum);
+        generateTCPPacket.setNeedCalculateIPCheckSum(needCalculateCheckSum);
+        generateTCPPacket.setCheckSum(checkSum);
+        try {
+            System.out.println("[SOURCE IP]: " + InetAddress.getByAddress(sourceIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+        generateTCPPacket.setSourceAddress(sourceIP);
+        generateTCPPacket.setDestinationAddress(destinationIP);
+
+        generateTCPPacket.setTCPSourcePort(tcpSourcePort);
+        generateTCPPacket.setTCPDestinationPort(tcpDestinationPort);
+        generateTCPPacket.setTCPSeqNumber(tcpSeq);
+        generateTCPPacket.setTCPAckNumber(tcpACK);
+        generateTCPPacket.setTCPHeaderLength(tcpHeaderLength);
+        generateTCPPacket.setTCPSyn(tcpFlagSYN);
+        generateTCPPacket.setTCPAck(tcpFlagACK);
+        generateTCPPacket.setTCPFin(tcpFlagFIN);
+        generateTCPPacket.setTCPRst(tcpFlagRST);
+        generateTCPPacket.setTCPPsh(tcpFlagPSH);
+        generateTCPPacket.setTCPUrg(tcpFlagURG);
+        generateTCPPacket.setTCPReservedCWR(tcpFlagCWR);
+        generateTCPPacket.setTCPReservedECE(tcpFlagECE);
+        generateTCPPacket.setTCPReserved1(tcpFlagReserved1);
+        generateTCPPacket.setTCPReserved2(tcpFlagReserved2);
+        generateTCPPacket.setTCPReserved3(tcpFlagReserved3);
+        generateTCPPacket.setTCPReserved4(tcpFlagReserved4);
+
+        generateTCPPacket.setTCPWinSize(tcpWinSize);
+        generateTCPPacket.setTCPCheckSum(tcpCheckSum);
+        generateTCPPacket.setTCPCalculateCheckSum(tcpNeedCalculateCheckSum);
+        generateTCPPacket.setTCPUrgentPointer(tcpUrgentPointer);
+
+        generateTCPPacket.setTCPData(tcpData);
+        generateTCPPacket.generate();
+        return generateTCPPacket;
+    }
+    private GenerateUDPPacket readIpAndUdpParametersAndGeneratePacket() {
+        int version = Integer.parseInt(textFieldVersion.getText());
+        int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
+        int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
+        int tosD = Integer.parseInt(textFieldTypeD.getText());
+        int tosT = Integer.parseInt(textFieldTypeT.getText());
+        int tosR = Integer.parseInt(textFieldTypeR.getText());
+        int tosECN = Integer.parseInt(textFieldTypeECN.getText());
+        int totalLength = Integer.parseInt(textFieldTotalLenght.getText());
+        int id = Integer.parseInt(textFieldID.getText());
+        boolean flagX = checkBoxFlagsX.isSelected();
+        boolean flagD = checkBoxFlagsD.isSelected();
+        boolean flagM = checkBoxFlagsM.isSelected();
+        int offset = Integer.parseInt(textFieldOffset.getText());
+        int ttl = Integer.parseInt(textFieldTTL.getText());
+        int checkSum = 0;
+        boolean needCalculateCheckSum = false;
+        if (textFieldHeaderCheckSum.getText().matches("\\w")) {
+            needCalculateCheckSum = true;
+        } else {
+            checkSum = Integer.parseInt(textFieldHeaderCheckSum.getText());
+        }
+        byte[] sourceIP = null;
+        byte[] destinationIP = null;
+
+        try {
+            sourceIP = InetAddress.getByName(textFieldSourceIP.getText()).getAddress();
+            destinationIP = InetAddress.getByName(textFieldDestinationIP.getText()).getAddress();
+            System.out.println("[IP TEXT]: " + InetAddress.getByAddress(destinationIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+
+        int udpSourcePort = Integer.parseInt(textFieldUDPSourcePort.getText());
+        int udpDestinationPort = Integer.parseInt(textFieldUDPDestinationPort.getText());
+        int udpChecksum = 0;
+        boolean udpNeedCalculateCheckSum = false;
+        if (textFieldUDPCheckSum.getText().matches("\\w")) {
+            udpNeedCalculateCheckSum = true;
+        } else {
+            udpChecksum = Integer.parseInt(textFieldUDPCheckSum.getText());
+        }
+
+        int udpLength = Integer.parseInt(textFieldUDPLenght.getText());
+
+        byte[] tcpData = textFieldUDPData.getText().getBytes();
+
+
+        udpPacket = new UDPPacket(Math.max(tcpData.length + 4 * headerLength + 4 * udpLength, totalLength));
+        generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
+
+        generateUDPPacket.setVersion(version);
+        generateUDPPacket.setHeaderLength(headerLength);
+        generateUDPPacket.setPrecedence(typePrecedence);
+        generateUDPPacket.setTosD(tosD);
+        generateUDPPacket.setTosECN(tosECN);
+        generateUDPPacket.setTosR(tosR);
+        generateUDPPacket.setTosT(tosT);
+        generateUDPPacket.setTotalLength(totalLength);
+        generateUDPPacket.setID(id);
+        generateUDPPacket.setFlagD(flagD ? 1 : 0);
+        generateUDPPacket.setFlagM(flagM ? 1 : 0);
+        generateUDPPacket.setFlagX(flagX ? 1 : 0);
+        generateUDPPacket.setOffset(offset);
+        generateUDPPacket.setTTL(ttl);
+        generateUDPPacket.setNeedCalculateTCPCheckSum(udpNeedCalculateCheckSum);
+        generateUDPPacket.setNeedCalculateIPCheckSum(needCalculateCheckSum);
+        generateUDPPacket.setCheckSum(checkSum);
+        try {
+            System.out.println("[SOURCE IP]: " + InetAddress.getByAddress(sourceIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+        generateUDPPacket.setSourceAddress(sourceIP);
+        generateUDPPacket.setDestinationAddress(destinationIP);
+
+        generateUDPPacket.setUDPSourcePort(udpSourcePort);
+        generateUDPPacket.setUDPDestinationPort(udpDestinationPort);
+        generateUDPPacket.setUDPLength(udpLength);
+        generateUDPPacket.setUDPCheckSum(udpChecksum);
+        generateUDPPacket.setUDPCalculateCheckSum(udpNeedCalculateCheckSum);
+
+        generateUDPPacket.setUDPData(tcpData);
+        generateUDPPacket.generate();
+        return generateUDPPacket;
+    }
+    private GenerateICMPPacket readIpAndIcmpParametersAndGeneratePacket() {
+        int version = Integer.parseInt(textFieldVersion.getText());
+        int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
+        int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
+        int tosD = Integer.parseInt(textFieldTypeD.getText());
+        int tosT = Integer.parseInt(textFieldTypeT.getText());
+        int tosR = Integer.parseInt(textFieldTypeR.getText());
+        int tosECN = Integer.parseInt(textFieldTypeECN.getText());
+        int totalLength = Integer.parseInt(textFieldTotalLenght.getText());
+        int id = Integer.parseInt(textFieldID.getText());
+        boolean flagX = checkBoxFlagsX.isSelected();
+        boolean flagD = checkBoxFlagsD.isSelected();
+        boolean flagM = checkBoxFlagsM.isSelected();
+        int offset = Integer.parseInt(textFieldOffset.getText());
+        int ttl = Integer.parseInt(textFieldTTL.getText());
+        int checkSum = 0;
+        boolean needCalculateCheckSum = false;
+        if (textFieldHeaderCheckSum.getText().matches("\\w")) {
+            needCalculateCheckSum = true;
+        } else {
+            checkSum = Integer.parseInt(textFieldHeaderCheckSum.getText());
+        }
+        byte[] sourceIP = null;
+        byte[] destinationIP = null;
+
+        try {
+            sourceIP = InetAddress.getByName(textFieldSourceIP.getText()).getAddress();
+            destinationIP = InetAddress.getByName(textFieldDestinationIP.getText()).getAddress();
+            System.out.println("[IP TEXT]: " + InetAddress.getByAddress(destinationIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+
+        int icmpChecksum = 0;
+        boolean icmpNeedCalculateCheckSum = false;
+        if (textFieldICMPCheckSum.getText().matches("\\w")) {
+            icmpNeedCalculateCheckSum = true;
+        } else {
+            icmpChecksum = Integer.parseInt(textFieldICMPCheckSum.getText());
+        }
+        int icmpCode = Integer.parseInt(textFieldICMPCode.getText());
+        int icmpID = Integer.parseInt(textFieldICMPID.getText());
+        int icmpSeqNumber = Integer.parseInt(textFieldICMPSequence.getText());
+        int icmpType = comboBoxICMPType.getSelectedIndex() == 1 ? 0 : 8;
+        byte[] icmpData = textFieldICMPData.getText().getBytes();
+
+
+        icmpEchoPacket = new ICMPEchoPacket(Math.max(icmpData.length + 4 * headerLength + 4 * 8, totalLength));
+        generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
+
+        generateICMPPacket.setVersion(version);
+        generateICMPPacket.setHeaderLength(headerLength);
+        generateICMPPacket.setPrecedence(typePrecedence);
+        generateICMPPacket.setTosD(tosD);
+        generateICMPPacket.setTosECN(tosECN);
+        generateICMPPacket.setTosR(tosR);
+        generateICMPPacket.setTosT(tosT);
+        generateICMPPacket.setTotalLength(totalLength);
+        generateICMPPacket.setID(id);
+        generateICMPPacket.setFlagD(flagD ? 1 : 0);
+        generateICMPPacket.setFlagM(flagM ? 1 : 0);
+        generateICMPPacket.setFlagX(flagX ? 1 : 0);
+        generateICMPPacket.setOffset(offset);
+        generateICMPPacket.setTTL(ttl);
+        generateICMPPacket.setNeedCalculateTCPCheckSum(icmpNeedCalculateCheckSum);
+        generateICMPPacket.setNeedCalculateIPCheckSum(needCalculateCheckSum);
+        generateICMPPacket.setCheckSum(checkSum);
+        try {
+            System.out.println("[SOURCE IP]: " + InetAddress.getByAddress(sourceIP).getHostAddress());
+        } catch (UnknownHostException e1) {
+            e1.printStackTrace();
+        }
+        generateICMPPacket.setSourceAddress(sourceIP);
+        generateICMPPacket.setDestinationAddress(destinationIP);
+
+        generateICMPPacket.setICMPCheckSum(icmpChecksum);
+        generateICMPPacket.setICMPCalculateCheckSum(icmpNeedCalculateCheckSum);
+        generateICMPPacket.setICMPCode(icmpCode);
+        generateICMPPacket.setICMPID(icmpID);
+        generateICMPPacket.setICMPSeqNumber(icmpSeqNumber);
+        generateICMPPacket.setICMPType(icmpType);
+
+        generateICMPPacket.setICMPData(icmpData);
+        generateICMPPacket.generate();
+        return generateICMPPacket;
+    }
 
 	private void addTCPListeners() {
 		buttonTCPSend.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int version = Integer.parseInt(textFieldVersion.getText());
-				int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
-				int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
-				int tosD = Integer.parseInt(textFieldTypeD.getText());
-				int tosT = Integer.parseInt(textFieldTypeT.getText());
-				int tosR = Integer.parseInt(textFieldTypeR.getText());
-				int tosECN = Integer.parseInt(textFieldTypeECN.getText());
-				int totalLength = Integer.parseInt(textFieldTotalLenght.getText());
-				int id = Integer.parseInt(textFieldID.getText());
-				boolean flagX = checkBoxFlagsX.isSelected();
-				boolean flagD = checkBoxFlagsD.isSelected();
-				boolean flagM = checkBoxFlagsM.isSelected();
-				int offset = Integer.parseInt(textFieldOffset.getText());
-				int ttl = Integer.parseInt(textFieldTTL.getText());
-				int checkSum = 0;
-				boolean needCalculateCheckSum = false;
-				if (textFieldHeaderCheckSum.getText().matches("\\w")) {
-					needCalculateCheckSum = true;
-				} else {
-					checkSum = Integer.parseInt(textFieldHeaderCheckSum.getText());
-				}
-				byte[] sourceIP = null;
-				byte[] destinationIP = null;
-
-				try {
-
-					sourceIP = InetAddress.getByName(textFieldSourceIP.getText()).getAddress();
-
-					destinationIP = InetAddress.getByName(textFieldDestinationIP.getText()).getAddress();
-					System.out.println("[IP TEXT]: " + InetAddress.getByAddress(destinationIP).getHostAddress());
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				}
-
-				int tcpSourcePort = Integer.parseInt(textFieldTCPSourcePort.getText());
-				int tcpDestinationPort = Integer.parseInt(textFieldTCPDestinationPort.getText());
-				int tcpSeq = Integer.parseInt(textFieldTCPSeq.getText());
-				int tcpWinSize = Integer.parseInt(textFieldTCPWin.getText());
-				int tcpCheckSum = 0;
-				boolean tcpNeedCalculateCheckSum = false;
-				if (textFieldTCPCheckSum.getText().matches("\\w")) {
-					tcpNeedCalculateCheckSum = true;
-				} else {
-					tcpCheckSum = Integer.parseInt(textFieldTCPCheckSum.getText());
-				}
-
-				int tcpHeaderLength = Integer.parseInt(textFieldTCPHeaderLenght.getText());
-				int tcpACK = Integer.parseInt(textFieldTCPAck.getText());
-				boolean tcpFlagSYN = checkBoxTCPFlagsSYN.isSelected();
-				boolean tcpFlagACK = checkBoxTCPFlagsACK.isSelected();
-				boolean tcpFlagFIN = checkBoxTCPFlagsFIN.isSelected();
-				boolean tcpFlagRST = checkBoxTCPFlagsRST.isSelected();
-				boolean tcpFlagPSH = checkBoxTCPFlagsPSH.isSelected();
-				boolean tcpFlagURG = checkBoxTCPFlagsURG.isSelected();
-				int tcpUrgentPointer = Integer.parseInt(textFieldTCPUrgentPointer.getText());
-
-				byte[] tcpData = textFieldTCPData.getText().getBytes();
-
-
-				TCPPacket pack = new TCPPacket(tcpData.length + 4 * headerLength + 4 * tcpHeaderLength);
-				GenerateTCPPacket generateTCPPacket = new GenerateTCPPacket(pack);
-
-
-				generateTCPPacket.setVersion(version);
-				generateTCPPacket.setHeaderLength(headerLength);
-				generateTCPPacket.setPrecedence(typePrecedence);
-				generateTCPPacket.setTosD(tosD);
-				generateTCPPacket.setTosECN(tosECN);
-				generateTCPPacket.setTosR(tosR);
-				generateTCPPacket.setTosT(tosT);
-				generateTCPPacket.setTotalLength(totalLength);
-				generateTCPPacket.setID(id);
-				generateTCPPacket.setFlagD(flagD ? 1 : 0);
-				generateTCPPacket.setFlagM(flagM ? 1 : 0);
-				generateTCPPacket.setFlagX(flagX ? 1 : 0);
-				generateTCPPacket.setOffset(offset);
-				generateTCPPacket.setTTL(ttl);
-				generateTCPPacket.setCalculateCheckSum(needCalculateCheckSum);
-				generateTCPPacket.setCheckSum(checkSum);
-				try {
-					System.out.println("[SOURCE IP]: " + InetAddress.getByAddress(sourceIP).getHostAddress());
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				}
-				generateTCPPacket.setSourceAddress(sourceIP);
-				generateTCPPacket.setDestinationAddress(destinationIP);
-
-				generateTCPPacket.setTCPSourcePort(tcpSourcePort);
-				generateTCPPacket.setTCPDestinationPort(tcpDestinationPort);
-				generateTCPPacket.setTCPSeqNumber(tcpSeq);
-				generateTCPPacket.setTCPAckNumber(tcpACK);
-				generateTCPPacket.setTCPHeaderLength(tcpHeaderLength);
-				generateTCPPacket.setTCPSyn(tcpFlagSYN);
-				generateTCPPacket.setTCPAck(tcpFlagACK);
-				generateTCPPacket.setTCPFin(tcpFlagFIN);
-				generateTCPPacket.setTCPRst(tcpFlagRST);
-				generateTCPPacket.setTCPPsh(tcpFlagPSH);
-				generateTCPPacket.setTCPUrg(tcpFlagURG);
-
-				generateTCPPacket.setTCPWinSize(tcpWinSize);
-				generateTCPPacket.setTCPCheckSum(tcpCheckSum);
-				generateTCPPacket.setTCPCalculateCheckSum(tcpNeedCalculateCheckSum);
-				generateTCPPacket.setTCPUrgentPointer(tcpUrgentPointer);
-
-				generateTCPPacket.setTCPData(tcpData);
-				generateTCPPacket.generate();
-				generateTCPPacket.send();
+				readIpAndTcpParametersAndGeneratePacket().send();
 			}
 		});
 
+        buttonTCPCansel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
 
-//		buttonUDPSend.addActionListener(new ActionListener() {
-//			@Override
-//			public void actionPerformed(ActionEvent e) {
-//				ipPacket.setSelectedType(UDPPacket.class);
-//				ipPacket.send();
-//			}
-//		});
+        buttonTCPOpen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                fileChooser.showOpenDialog(null);
+                File selectedFile = fileChooser.getSelectedFile();
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(selectedFile);
+                    int b;
+                    java.util.List<Integer> buffer = new ArrayList<Integer>();
+                    while((b = fis.read()) != -1) {
+                        buffer.add(b);
+                    }
+                    byte[] byteBuffer = new byte[buffer.size()];
+                    for (int i = 0; i < buffer.size(); i++) {
+                        byteBuffer[i] = buffer.get(i).byteValue();
+                    }
+                    tcpPacket = new TCPPacket(byteBuffer.length);
+                    tcpPacket.setData(byteBuffer);
+                    generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
+                    updateIpAndTcpFields();
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fis != null) {
+                            fis.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
 
 
+            }
+        });
+
+        buttonTCPSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FileOutputStream fos = null;
+                GenerateTCPPacket generateTCPPacket = readIpAndTcpParametersAndGeneratePacket();
+
+                byte[] buffer = new byte[generateTCPPacket.getTcpPacket().size()];
+                generateTCPPacket.getTcpPacket().getData(buffer);
+                try {
+                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".tcp");
+                    fos.write(buffer);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fos != null) {
+                            fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
 	}
 
+    private void updateIpAndTcpFields(){
+        textFieldVersion.setText(String.valueOf(tcpPacket.getIPVersion()));
+        textFieldHeaderLenght.setText(String.valueOf(tcpPacket.getIPHeaderLength()));
+        textFieldTotalLenght.setText(String.valueOf(tcpPacket.getIPPacketLength()));
+        textFieldOffset.setText(String.valueOf(tcpPacket.getFragmentOffset()));
+        textFieldID.setText(String.valueOf(tcpPacket.getIdentification()));
+        textFieldHeaderCheckSum.setText(String.valueOf(tcpPacket.getIPChecksum()));
+        textFieldTTL.setText(String.valueOf(tcpPacket.getTTL()));
+
+        int typeOfService = tcpPacket.getTypeOfService();
+        textFieldTypePrecedence.setText(String.valueOf((typeOfService & 0xe0) >> 5));
+        textFieldTypeD.setText(String.valueOf((typeOfService & 0x10) >> 4));
+        textFieldTypeT.setText(String.valueOf((typeOfService & 0x8) >> 3));
+        textFieldTypeR.setText(String.valueOf((typeOfService & 0x4) >> 2));
+        textFieldTypeECN.setText(String.valueOf(typeOfService & 0x3));
+
+        int ipFlags = tcpPacket.getIPFlags();
+
+        checkBoxFlagsX.setSelected((ipFlags & 0x4)>>2 == 1);
+        checkBoxFlagsD.setSelected((ipFlags & 0x2)>>1 == 1);
+        checkBoxFlagsM.setSelected((ipFlags & 0x1)>>1 == 1);
+
+        textFieldTCPHeaderLenght.setText(String.valueOf(tcpPacket.getTCPHeaderLength()));
+        textFieldTCPSourcePort.setText(String.valueOf(tcpPacket.getSourcePort()));
+        textFieldTCPDestinationPort.setText(String.valueOf(tcpPacket.getDestinationPort()));
+        textFieldTCPCheckSum.setText(String.valueOf(tcpPacket.getTCPChecksum()));
+        textFieldTCPUrgentPointer.setText(String.valueOf(tcpPacket.getUrgentPointer()));
+//        textFieldTCPData.setText(Arrays.toString(tcpPacket.getT));
+        textFieldTCPSeq.setText(String.valueOf(tcpPacket.getSequenceNumber()));
+        textFieldTCPAck.setText(String.valueOf(tcpPacket.getAckNumber()));
+        textFieldTCPWin.setText(String.valueOf(tcpPacket.getWindowSize()));
+
+        int flags = tcpPacket.getControlFlags();
+        checkBoxTCPFlagsACK.setSelected((flags & TCPPacket.MASK_ACK) != 0);
+        checkBoxTCPFlagsFIN.setSelected((flags & TCPPacket.MASK_FIN) != 0);
+        checkBoxTCPFlagsSYN.setSelected((flags & TCPPacket.MASK_SYN) != 0);
+        checkBoxTCPFlagsRST.setSelected((flags & TCPPacket.MASK_RST) != 0);
+        checkBoxTCPFlagsPSH.setSelected((flags & TCPPacket.MASK_PSH) != 0);
+        checkBoxTCPFlagsURG.setSelected((flags & TCPPacket.MASK_URG) != 0);
+        checkBoxTCPReservedCWR.setSelected((flags & TCPPacket.MASK_CWR) != 0);
+        checkBoxTCPReservedECE.setSelected((flags & TCPPacket.MASK_ECE) != 0);
+
+        int reservedFlags = tcpPacket.getReservedBits4();
+        checkBoxTCPReserved1.setSelected((reservedFlags & TCPPacket.MASK_RESERVED_1) != 0);
+        checkBoxTCPReserved2.setSelected((reservedFlags & TCPPacket.MASK_RESERVED_2) != 0);
+        checkBoxTCPReserved3.setSelected((reservedFlags & TCPPacket.MASK_RESERVED_3) != 0);
+        checkBoxTCPReserved4.setSelected((reservedFlags & TCPPacket.MASK_RESERVED_4) != 0);
+
+        try {
+            textFieldSourceIP.setText(tcpPacket.getSourceAsInetAddress().getHostAddress());
+            textFieldDestinationIP.setText(tcpPacket.getDestinationAsInetAddress().getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+    private void updateIpAndUdpFields(){
+        textFieldVersion.setText(String.valueOf(udpPacket.getIPVersion()));
+        textFieldHeaderLenght.setText(String.valueOf(udpPacket.getIPHeaderLength()));
+        textFieldTotalLenght.setText(String.valueOf(udpPacket.getIPPacketLength()));
+        textFieldOffset.setText(String.valueOf(udpPacket.getFragmentOffset()));
+        textFieldID.setText(String.valueOf(udpPacket.getIdentification()));
+        textFieldHeaderCheckSum.setText(String.valueOf(udpPacket.getIPChecksum()));
+        textFieldTTL.setText(String.valueOf(udpPacket.getTTL()));
+
+        int typeOfService = udpPacket.getTypeOfService();
+        textFieldTypePrecedence.setText(String.valueOf((typeOfService & 0xe0) >> 5));
+        textFieldTypeD.setText(String.valueOf((typeOfService & 0x10) >> 4));
+        textFieldTypeT.setText(String.valueOf((typeOfService & 0x8) >> 3));
+        textFieldTypeR.setText(String.valueOf((typeOfService & 0x4) >> 2));
+        textFieldTypeECN.setText(String.valueOf(typeOfService & 0x3));
+
+        int ipFlags = udpPacket.getIPFlags();
+
+        checkBoxFlagsX.setSelected((ipFlags & 0x4)>>2 == 1);
+        checkBoxFlagsD.setSelected((ipFlags & 0x2)>>1 == 1);
+        checkBoxFlagsM.setSelected((ipFlags & 0x1)>>1 == 1);
+
+        textFieldUDPLenght.setText(String.valueOf(udpPacket.getUDPPacketLength()));
+        textFieldUDPSourcePort.setText(String.valueOf(udpPacket.getSourcePort()));
+        textFieldUDPDestinationPort.setText(String.valueOf(udpPacket.getDestinationPort()));
+        textFieldUDPCheckSum.setText(String.valueOf(udpPacket.getUDPChecksum()));
+//        textFieldTCPData.setText(Arrays.toString(udpPacket.getT));
+
+        try {
+            textFieldSourceIP.setText(udpPacket.getSourceAsInetAddress().getHostAddress());
+            textFieldDestinationIP.setText(udpPacket.getDestinationAsInetAddress().getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
+    private void updateIpAndIcmpFields(){
+        textFieldVersion.setText(String.valueOf(icmpEchoPacket.getIPVersion()));
+        textFieldHeaderLenght.setText(String.valueOf(icmpEchoPacket.getIPHeaderLength()));
+        textFieldTotalLenght.setText(String.valueOf(icmpEchoPacket.getIPPacketLength()));
+        textFieldOffset.setText(String.valueOf(icmpEchoPacket.getFragmentOffset()));
+        textFieldID.setText(String.valueOf(icmpEchoPacket.getIdentification()));
+        textFieldHeaderCheckSum.setText(String.valueOf(icmpEchoPacket.getIPChecksum()));
+        textFieldTTL.setText(String.valueOf(icmpEchoPacket.getTTL()));
+
+        int typeOfService = icmpEchoPacket.getTypeOfService();
+        textFieldTypePrecedence.setText(String.valueOf((typeOfService & 0xe0) >> 5));
+        textFieldTypeD.setText(String.valueOf((typeOfService & 0x10) >> 4));
+        textFieldTypeT.setText(String.valueOf((typeOfService & 0x8) >> 3));
+        textFieldTypeR.setText(String.valueOf((typeOfService & 0x4) >> 2));
+        textFieldTypeECN.setText(String.valueOf(typeOfService & 0x3));
+
+        int ipFlags = icmpEchoPacket.getIPFlags();
+
+        checkBoxFlagsX.setSelected((ipFlags & 0x4)>>2 == 1);
+        checkBoxFlagsD.setSelected((ipFlags & 0x2)>>1 == 1);
+        checkBoxFlagsM.setSelected((ipFlags & 0x1)>>1 == 1);
+
+        textFieldICMPSequence.setText(String.valueOf(icmpEchoPacket.getSequenceNumber()));
+        textFieldICMPCheckSum.setText(String.valueOf(icmpEchoPacket.getICMPChecksum()));
+        textFieldICMPCode.setText(String.valueOf(icmpEchoPacket.getCode()));
+        comboBoxICMPType.setSelectedIndex(icmpEchoPacket.getType() == 0 ? 1 : 2);
+        textFieldICMPID.setText(String.valueOf(icmpEchoPacket.getIdentifier()));
+//        textFieldTCPData.setText(Arrays.toString(icmpEchoPacket.getT));
+
+        try {
+            textFieldSourceIP.setText(icmpEchoPacket.getSourceAsInetAddress().getHostAddress());
+            textFieldDestinationIP.setText(icmpEchoPacket.getDestinationAsInetAddress().getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+    }
 
 	private void addUDPListeners() {
+        buttonUDPSend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                readIpAndUdpParametersAndGeneratePacket().send();
+            }
+        });
+        buttonUDPCansel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        buttonUDPOpen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                fileChooser.showOpenDialog(null);
+                File selectedFile = fileChooser.getSelectedFile();
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(selectedFile);
+                    int b;
+                    java.util.List<Integer> buffer = new ArrayList<Integer>();
+                    while((b = fis.read()) != -1) {
+                        buffer.add(b);
+                    }
+                    byte[] byteBuffer = new byte[buffer.size()];
+                    for (int i = 0; i < buffer.size(); i++) {
+                        byteBuffer[i] = buffer.get(i).byteValue();
+                    }
+                    udpPacket = new UDPPacket(byteBuffer.length);
+                    udpPacket.setData(byteBuffer);
+                    generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
+                    updateIpAndUdpFields();
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fis != null) {
+                            fis.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
 
 
+            }
+        });
+
+        buttonUDPSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FileOutputStream fos = null;
+                GenerateUDPPacket generateUDPPacket1 = readIpAndUdpParametersAndGeneratePacket();
+
+                byte[] buffer = new byte[generateUDPPacket1.getUdpPacket().size()];
+                generateUDPPacket1.getUdpPacket().getData(buffer);
+                try {
+                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".udp");
+                    fos.write(buffer);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fos != null) {
+                            fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
 	}
+    
+    private void addICMPListeners() {
+        buttonICMPCansel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+        buttonICMPSend.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                readIpAndIcmpParametersAndGeneratePacket().send();
+            }
+        });
+        buttonICMPOpen.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                fileChooser.showOpenDialog(null);
+                File selectedFile = fileChooser.getSelectedFile();
+                FileInputStream fis = null;
+                try {
+                    fis = new FileInputStream(selectedFile);
+                    int b;
+                    java.util.List<Integer> buffer = new ArrayList<Integer>();
+                    while((b = fis.read()) != -1) {
+                        buffer.add(b);
+                    }
+                    byte[] byteBuffer = new byte[buffer.size()];
+                    for (int i = 0; i < buffer.size(); i++) {
+                        byteBuffer[i] = buffer.get(i).byteValue();
+                    }
+                    icmpEchoPacket = new ICMPEchoPacket(byteBuffer.length);
+                    icmpEchoPacket.setData(byteBuffer);
+                    generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
+                    updateIpAndIcmpFields();
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fis != null) {
+                            fis.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+
+
+            }
+        });
+
+        buttonICMPSave.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FileOutputStream fos = null;
+                GenerateICMPPacket generateICMPPacket1 = readIpAndIcmpParametersAndGeneratePacket();
+
+                byte[] buffer = new byte[generateICMPPacket1.getIcmpEchoPacket().size()];
+                generateICMPPacket1.getIcmpEchoPacket().getData(buffer);
+                try {
+                    fos = new FileOutputStream(String.valueOf(System.currentTimeMillis()) + ".icmp");
+                    fos.write(buffer);
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                } finally {
+                    try {
+                        if (fos != null) {
+                            fos.close();
+                        }
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                }
+            }
+        });
+        
+    }
+    
 
 	/**
 	 * Method generated by IntelliJ IDEA GUI Designer
@@ -468,9 +1055,9 @@ public class GuiForm extends JFrame {
 		panelTCPButtons = new JPanel();
 		panelTCPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
 		panelTCP.add(panelTCPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-		buttonTCPSafe = new JButton();
-		buttonTCPSafe.setText("Safe");
-		panelTCPButtons.add(buttonTCPSafe, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		buttonTCPSave = new JButton();
+		buttonTCPSave.setText("Safe");
+		panelTCPButtons.add(buttonTCPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		buttonTCPSend = new JButton();
 		buttonTCPSend.setText("Send");
 		panelTCPButtons.add(buttonTCPSend, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -504,14 +1091,14 @@ public class GuiForm extends JFrame {
 		panelUDPTop.add(textFieldUDPSourcePort, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		textFieldUDPDestinationPort = new JTextField();
 		panelUDPTop.add(textFieldUDPDestinationPort, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		textFieldUDPHeaderLenght = new JTextField();
-		panelUDPTop.add(textFieldUDPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		textFieldUDPLenght = new JTextField();
+		panelUDPTop.add(textFieldUDPLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		panelUDPButtons = new JPanel();
 		panelUDPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
 		panelUDP.add(panelUDPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-		buttonUDPSafe = new JButton();
-		buttonUDPSafe.setText("Safe");
-		panelUDPButtons.add(buttonUDPSafe, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		buttonUDPSave = new JButton();
+		buttonUDPSave.setText("Safe");
+		panelUDPButtons.add(buttonUDPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		buttonUDPCansel = new JButton();
 		buttonUDPCansel.setText("Cansel");
 		panelUDPButtons.add(buttonUDPCansel, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -533,11 +1120,11 @@ public class GuiForm extends JFrame {
 		panelICMPTop.add(labelICMPCode, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		textFieldICMPCode = new JTextField();
 		panelICMPTop.add(textFieldICMPCode, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		labelCheckSum = new JLabel();
-		labelCheckSum.setText("CheckSum");
-		panelICMPTop.add(labelCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		textFieldCheckSum = new JTextField();
-		panelICMPTop.add(textFieldCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
+		labelICMPCheckSum = new JLabel();
+		labelICMPCheckSum.setText("CheckSum");
+		panelICMPTop.add(labelICMPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		textFieldICMPCheckSum = new JTextField();
+		panelICMPTop.add(textFieldICMPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		labelICMPID = new JLabel();
 		labelICMPID.setText("ID");
 		panelICMPTop.add(labelICMPID, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
@@ -548,16 +1135,6 @@ public class GuiForm extends JFrame {
 		panelICMPTop.add(labelICMPSequence, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		textFieldICMPSequence = new JTextField();
 		panelICMPTop.add(textFieldICMPSequence, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		labelICMPHeaderLenght = new JLabel();
-		labelICMPHeaderLenght.setText("ICMP Header Lenght");
-		panelICMPTop.add(labelICMPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(5, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		textFieldICMPHeaderLenght = new JTextField();
-		panelICMPTop.add(textFieldICMPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(5, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-		labelICMPDataLenght = new JLabel();
-		labelICMPDataLenght.setText("Data Lenght");
-		panelICMPTop.add(labelICMPDataLenght, new com.intellij.uiDesigner.core.GridConstraints(6, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-		textFieldICMPDataLenght = new JTextField();
-		panelICMPTop.add(textFieldICMPDataLenght, new com.intellij.uiDesigner.core.GridConstraints(6, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
 		panelICMPBottom = new JPanel();
 		panelICMPBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
 		panelICMP.add(panelICMPBottom, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
@@ -569,9 +1146,9 @@ public class GuiForm extends JFrame {
 		panelICMPButtons = new JPanel();
 		panelICMPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 3, new Insets(0, 0, 0, 0), -1, -1));
 		panelICMP.add(panelICMPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-		buttonICMPSafe = new JButton();
-		buttonICMPSafe.setText("Safe");
-		panelICMPButtons.add(buttonICMPSafe, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+		buttonICMPSave = new JButton();
+		buttonICMPSave.setText("Safe");
+		panelICMPButtons.add(buttonICMPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
 		buttonICMPCansel = new JButton();
 		buttonICMPCansel.setText("Cansel");
 		panelICMPButtons.add(buttonICMPCansel, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));

@@ -210,6 +210,11 @@ public abstract class ICMPPacket extends IPPacket {
                              getIPPacketLength(), 0, update);
   }
 
+    public final void setICMPCheckSum(int checkSum) {
+        _computeChecksum_(_offset, _offset + OFFSET_ICMP_CHECKSUM,
+                getIPPacketLength(), 0, true, checkSum);
+    }
+
 
   /**
    * Same as <code>computeICMPChecksum(true);</code>
