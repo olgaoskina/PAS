@@ -38,6 +38,9 @@ public class SelectDevice {
                 e.printStackTrace();
             }
         }
+        if (result == JOptionPane.CANCEL_OPTION) {
+            System.exit(0);
+        }
 
     }
 

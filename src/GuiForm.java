@@ -182,8 +182,8 @@ public class GuiForm extends JFrame {
 
 		textFieldDestinationIP = new JTextField();
 		textFieldSourceIP = new JTextField();
-		textFieldSourceIP.setText("192.168.0.103");
-		textFieldDestinationIP.setText("192.168.0.104");
+		textFieldSourceIP.setText("10.0.177.124");
+		textFieldDestinationIP.setText("10.0.177.126");
 
 
 		try {
@@ -226,7 +226,7 @@ public class GuiForm extends JFrame {
 
 
 		textFieldVersion.setText("4");
-		textFieldHeaderCheckSum.setText("123");
+		textFieldHeaderCheckSum.setText("a");
 		textFieldTotalLenght.setText("200");
 		textFieldHeaderLenght.setText("12");
 		textFieldID.setText("55");

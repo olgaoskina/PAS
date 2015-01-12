@@ -48,7 +48,8 @@ abstract public class GenerateIPPacket {
 
     abstract public void send();
 
-    public GenerateIPPacket(IPPacket pack) {
+    public GenerateIPPacket(IPPacket pack, String device) {
+        SELECTED_DEVICE = device;
         this.pack = pack;
         pcap = Pcap.openLive(SELECTED_DEVICE, Pcap.DEFAULT_SNAPLEN, Pcap.MODE_PROMISCUOUS, Pcap.DEFAULT_TIMEOUT, new StringBuilder());
     }
@@ -56,6 +57,7 @@ abstract public class GenerateIPPacket {
     public void generate() {
         pack.setIPVersion(VERSION);
         pack.setIPHeaderLength(HEADER_LENGTH);
+
         int b;
         b = (TOS_PRECEDENCE << 5);
         b |= (TOS_D << 4);

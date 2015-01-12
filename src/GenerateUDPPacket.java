@@ -34,8 +34,7 @@ public class GenerateUDPPacket extends GenerateIPPacket {
     }
 
     public GenerateUDPPacket(UDPPacket pack, String device) {
-        super(pack);
-        SELECTED_DEVICE = device;
+        super(pack, device);
     }
 
     @Override

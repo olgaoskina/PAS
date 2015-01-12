@@ -54,9 +54,7 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
     private TCPPacket tcpPacket;
 
     public GenerateTCPPacket(TCPPacket pack, String device) {
-        super(pack);
-        SELECTED_DEVICE = device;
-
+        super(pack, device);
     }
 
     @Override

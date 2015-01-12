@@ -31,6 +31,8 @@ public class GetMacAddressByIpAddress {
                 String macAddress = matcher.group().replaceFirst("^" + ipAddress + "[^0-9a-z-]+", "");
                 System.out.println("[MAC ADDRESS]: " + macAddress);
                 return parseMacAddress(macAddress);
+            } else {
+                return Main.SOURCE_IP_ADDRESS;
             }
         } catch (IOException e) {
             e.printStackTrace();
