@@ -1,6 +1,3 @@
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
 /**
  * Created by olgaoskina
  * 23 December 2014.

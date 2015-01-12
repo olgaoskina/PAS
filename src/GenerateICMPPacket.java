@@ -132,7 +132,7 @@ public class GenerateICMPPacket extends GenerateIPPacket {
         byte[] buffer = new byte[icmpEchoPacket.size()];
         icmpEchoPacket.getData(buffer);
         System.out.println("[ICMP DATA]: " + Arrays.toString(ICMP_DATA));
-        System.arraycopy(ICMP_DATA, 0, buffer, 4 * HEADER_LENGTH + 4 * icmpEchoPacket.getICMPHeaderByteLength(), ICMP_DATA.length);
+        System.arraycopy(ICMP_DATA, 0, buffer, 4 * HEADER_LENGTH + 4 * icmpEchoPacket.getICMPHeaderByteLength() - 6*4, ICMP_DATA.length);
         icmpEchoPacket.setData(buffer);
 
         byte[] array = new byte[icmpEchoPacket.size()];

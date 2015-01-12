@@ -544,7 +544,7 @@ public class GuiForm extends JFrame {
         byte[] icmpData = textFieldICMPData.getText().getBytes();
 
 
-        icmpEchoPacket = new ICMPEchoPacket(Math.max(icmpData.length + 4 * headerLength + 4 * 8, totalLength));
+        icmpEchoPacket = new ICMPEchoPacket(Math.max(icmpData.length + 4 * headerLength + 4 * 8 - 6 * 4, totalLength));
         generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
 
         generateICMPPacket.setVersion(version);
