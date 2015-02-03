@@ -1,4 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.savarese.vserv.tcpip.ICMPEchoPacket;
 import org.savarese.vserv.tcpip.TCPPacket;
 import org.savarese.vserv.tcpip.UDPPacket;
@@ -8,9 +7,6 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.MaskFormatter;
 import javax.swing.text.PlainDocument;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -161,11 +157,9 @@ public class GuiForm extends JFrame {
 
     private String DEVICE;
 
-
     public GuiForm(String device) {
         super("PAS");
         DEVICE = device;
-        $$$setupUI$$$();
         setContentPane(panelMain);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         pack();
@@ -175,7 +169,6 @@ public class GuiForm extends JFrame {
         addICMPListeners();
     }
 
-
     private void createUIComponents() {
         String[] items = {"Echo request", "Echo reply"};
         comboBoxICMPType = new JComboBox<String>(items);
@@ -184,7 +177,6 @@ public class GuiForm extends JFrame {
         textFieldSourceIP = new JTextField();
         textFieldSourceIP.setText("10.0.177.124");
         textFieldDestinationIP.setText("10.0.177.126");
-
 
         try {
             textFieldVersion = new JFormattedTextField(new MaskFormatter("#"));
@@ -224,7 +216,6 @@ public class GuiForm extends JFrame {
         textFieldOffset = new JTextField();
         textFieldTTL = new JTextField();
 
-
         textFieldVersion.setText("4");
         textFieldHeaderCheckSum.setText("a");
         textFieldTotalLenght.setText("200");
@@ -232,7 +223,6 @@ public class GuiForm extends JFrame {
         textFieldID.setText("55");
         textFieldOffset.setText("0");
         textFieldTTL.setText("23");
-
 
         textFieldTypePrecedence = new JTextField();
         textFieldTypeD = new JTextField();
@@ -282,7 +272,6 @@ public class GuiForm extends JFrame {
         textFieldICMPSequence = new JTextField();
         textFieldICMPData = new JTextField();
 
-
         textFieldICMPCheckSum.setText("a");
         textFieldICMPCode.setText("0");
         textFieldICMPID.setText("12");
@@ -291,6 +280,7 @@ public class GuiForm extends JFrame {
     }
 
     private GenerateTCPPacket readIpAndTcpParametersAndGeneratePacket() {
+//        READ
         int version = Integer.parseInt(textFieldVersion.getText());
         int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
         int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
@@ -316,9 +306,7 @@ public class GuiForm extends JFrame {
         byte[] destinationIP = null;
 
         try {
-
             sourceIP = InetAddress.getByName(textFieldSourceIP.getText()).getAddress();
-
             destinationIP = InetAddress.getByName(textFieldDestinationIP.getText()).getAddress();
             System.out.println("[IP TEXT]: " + InetAddress.getByAddress(destinationIP).getHostAddress());
         } catch (UnknownHostException e1) {
@@ -352,13 +340,11 @@ public class GuiForm extends JFrame {
         boolean tcpFlagReserved3 = checkBoxTCPReserved3.isSelected();
         boolean tcpFlagReserved4 = checkBoxTCPReserved4.isSelected();
         int tcpUrgentPointer = Integer.parseInt(textFieldTCPUrgentPointer.getText());
-
         byte[] tcpData = textFieldTCPData.getText().getBytes();
 
-
+//        WRITE
         tcpPacket = new TCPPacket(Math.max(tcpData.length + 4 * headerLength + 4 * tcpHeaderLength, totalLength));
         generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
-
         generateTCPPacket.setVersion(version);
         generateTCPPacket.setHeaderLength(headerLength);
         generateTCPPacket.setPrecedence(typePrecedence);
@@ -383,7 +369,6 @@ public class GuiForm extends JFrame {
         }
         generateTCPPacket.setSourceAddress(sourceIP);
         generateTCPPacket.setDestinationAddress(destinationIP);
-
         generateTCPPacket.setTCPSourcePort(tcpSourcePort);
         generateTCPPacket.setTCPDestinationPort(tcpDestinationPort);
         generateTCPPacket.setTCPSeqNumber(tcpSeq);
@@ -401,18 +386,17 @@ public class GuiForm extends JFrame {
         generateTCPPacket.setTCPReserved2(tcpFlagReserved2);
         generateTCPPacket.setTCPReserved3(tcpFlagReserved3);
         generateTCPPacket.setTCPReserved4(tcpFlagReserved4);
-
         generateTCPPacket.setTCPWinSize(tcpWinSize);
         generateTCPPacket.setTCPCheckSum(tcpCheckSum);
         generateTCPPacket.setTCPCalculateCheckSum(tcpNeedCalculateCheckSum);
         generateTCPPacket.setTCPUrgentPointer(tcpUrgentPointer);
-
         generateTCPPacket.setTCPData(tcpData);
         generateTCPPacket.generate();
         return generateTCPPacket;
     }
 
     private GenerateUDPPacket readIpAndUdpParametersAndGeneratePacket() {
+//        READ
         int version = Integer.parseInt(textFieldVersion.getText());
         int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
         int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
@@ -454,15 +438,12 @@ public class GuiForm extends JFrame {
         } else {
             udpChecksum = Integer.parseInt(textFieldUDPCheckSum.getText());
         }
-
         int udpLength = Integer.parseInt(textFieldUDPLenght.getText());
-
         byte[] tcpData = textFieldUDPData.getText().getBytes();
 
-
+//        WRITE
         udpPacket = new UDPPacket(Math.max(tcpData.length + 4 * headerLength + 4 * udpLength, totalLength));
         generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
-
         generateUDPPacket.setVersion(version);
         generateUDPPacket.setHeaderLength(headerLength);
         generateUDPPacket.setPrecedence(typePrecedence);
@@ -487,19 +468,18 @@ public class GuiForm extends JFrame {
         }
         generateUDPPacket.setSourceAddress(sourceIP);
         generateUDPPacket.setDestinationAddress(destinationIP);
-
         generateUDPPacket.setUDPSourcePort(udpSourcePort);
         generateUDPPacket.setUDPDestinationPort(udpDestinationPort);
         generateUDPPacket.setUDPLength(udpLength);
         generateUDPPacket.setUDPCheckSum(udpChecksum);
         generateUDPPacket.setNeedUDPCalculateCheckSum(udpNeedCalculateCheckSum);
-
         generateUDPPacket.setUDPData(tcpData);
         generateUDPPacket.generate();
         return generateUDPPacket;
     }
 
     private GenerateICMPPacket readIpAndIcmpParametersAndGeneratePacket() {
+//        READ
         int version = Integer.parseInt(textFieldVersion.getText());
         int headerLength = Integer.parseInt(textFieldHeaderLenght.getText());
         int typePrecedence = Integer.parseInt(textFieldTypePrecedence.getText());
@@ -531,7 +511,6 @@ public class GuiForm extends JFrame {
         } catch (UnknownHostException e1) {
             e1.printStackTrace();
         }
-
         int icmpChecksum = 0;
         boolean icmpNeedCalculateCheckSum = false;
         if (textFieldICMPCheckSum.getText().matches("\\w")) {
@@ -545,10 +524,9 @@ public class GuiForm extends JFrame {
         int icmpType = comboBoxICMPType.getSelectedIndex() == 1 ? 0 : 8;
         byte[] icmpData = textFieldICMPData.getText().getBytes();
 
-
+//        WRITE
         icmpEchoPacket = new ICMPEchoPacket(Math.max(icmpData.length + 4 * headerLength + 4 * 8 - 6 * 4, totalLength));
         generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
-
         generateICMPPacket.setVersion(version);
         generateICMPPacket.setHeaderLength(headerLength);
         generateICMPPacket.setPrecedence(typePrecedence);
@@ -573,149 +551,119 @@ public class GuiForm extends JFrame {
         }
         generateICMPPacket.setSourceAddress(sourceIP);
         generateICMPPacket.setDestinationAddress(destinationIP);
-
         generateICMPPacket.setICMPCheckSum(icmpChecksum);
         generateICMPPacket.setNeedICMPCalculateCheckSum(icmpNeedCalculateCheckSum);
         generateICMPPacket.setICMPCode(icmpCode);
         generateICMPPacket.setICMPID(icmpID);
         generateICMPPacket.setICMPSeqNumber(icmpSeqNumber);
         generateICMPPacket.setICMPType(icmpType);
-
         generateICMPPacket.setICMPData(icmpData);
         generateICMPPacket.generate();
         return generateICMPPacket;
     }
 
     private void addTCPListeners() {
-        buttonTCPSend.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                readIpAndTcpParametersAndGeneratePacket().send();
+        buttonTCPSend.addActionListener(e -> readIpAndTcpParametersAndGeneratePacket().send());
+
+        buttonTCPCansel.addActionListener(e -> System.exit(0));
+
+        buttonTCPOpen.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            fileChooser.showOpenDialog(null);
+            File selectedFile = fileChooser.getSelectedFile();
+
+            BufferedReader bufferedReader = null;
+            boolean needIp = false;
+            boolean needTcp = false;
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                needTcp = Boolean.parseBoolean(bufferedReader.readLine());
+
+                System.out.println("[NEED IP]: " + needIp);
+                System.out.println("[NEED TCP]: " + needTcp);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
+                try {
+                    if (bufferedReader != null) {
+                        bufferedReader.close();
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(selectedFile);
+                int b;
+                java.util.List<Integer> buffer = new ArrayList<Integer>();
+                while ((b = fis.read()) != -1) {
+                    buffer.add(b);
+                }
+                byte[] byteBuffer = new byte[buffer.size()];
+                for (int i = 0; i < buffer.size(); i++) {
+                    byteBuffer[i] = buffer.get(i).byteValue();
+                }
+                tcpPacket = new TCPPacket(byteBuffer.length);
+                tcpPacket.setData(byteBuffer);
+                generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
+                updateIpAndTcpFields();
+                if (needTcp) {
+                    textFieldTCPCheckSum.setText("a");
+                }
+                if (needIp) {
+                    textFieldHeaderCheckSum.setText("a");
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
+                try {
+                    if (fis != null) {
+                        fis.close();
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
 
-        buttonTCPCansel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
+        buttonTCPSave.addActionListener(e -> {
+            FileOutputStream fos = null;
+            GenerateTCPPacket generateTCPPacket1 = readIpAndTcpParametersAndGeneratePacket();
+
+            byte[] buffer = new byte[generateTCPPacket1.getTcpPacket().size()];
+            generateTCPPacket1.getTcpPacket().getData(buffer);
+            String time = String.valueOf(System.currentTimeMillis());
+            try {
+                fos = new FileOutputStream(time + ".tcp");
+                fos.write(buffer);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
+                try {
+                    if (fos != null) {
+                        fos.close();
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
-        });
-
-        buttonTCPOpen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-                fileChooser.showOpenDialog(null);
-                File selectedFile = fileChooser.getSelectedFile();
-
-                BufferedReader bufferedReader = null;
-                boolean needIp = false;
-                boolean needTcp = false;
+            OutputStreamWriter outputStreamWriter = null;
+            try {
+                outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".tcp.time"));
+                outputStreamWriter.write("" + generateTCPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                outputStreamWriter.write("" + generateTCPPacket1.TCP_NEED_CALCULATE_CHECK_SUM);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
-                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
-                    needTcp = Boolean.parseBoolean(bufferedReader.readLine());
-
-                    System.out.println("[NEED IP]: " + needIp);
-                    System.out.println("[NEED TCP]: " + needTcp);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (outputStreamWriter != null) {
+                        outputStreamWriter.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (bufferedReader != null) {
-                            bufferedReader.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(selectedFile);
-                    int b;
-                    java.util.List<Integer> buffer = new ArrayList<Integer>();
-                    while ((b = fis.read()) != -1) {
-                        buffer.add(b);
-                    }
-                    byte[] byteBuffer = new byte[buffer.size()];
-                    for (int i = 0; i < buffer.size(); i++) {
-                        byteBuffer[i] = buffer.get(i).byteValue();
-                    }
-                    tcpPacket = new TCPPacket(byteBuffer.length);
-                    tcpPacket.setData(byteBuffer);
-                    generateTCPPacket = new GenerateTCPPacket(tcpPacket, DEVICE);
-                    updateIpAndTcpFields();
-                    if (needTcp) {
-                        textFieldTCPCheckSum.setText("a");
-                    }
-                    if (needIp) {
-                        textFieldHeaderCheckSum.setText("a");
-                    }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fis != null) {
-                            fis.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-
-            }
-        });
-
-        buttonTCPSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FileOutputStream fos = null;
-                GenerateTCPPacket generateTCPPacket1 = readIpAndTcpParametersAndGeneratePacket();
-
-                byte[] buffer = new byte[generateTCPPacket1.getTcpPacket().size()];
-                generateTCPPacket1.getTcpPacket().getData(buffer);
-                String time = String.valueOf(System.currentTimeMillis());
-                try {
-                    fos = new FileOutputStream(time + ".tcp");
-                    fos.write(buffer);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fos != null) {
-                            fos.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-                OutputStreamWriter outputStreamWriter = null;
-                try {
-                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".tcp.time"));
-                    outputStreamWriter.write("" + generateTCPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
-                    outputStreamWriter.write("" + generateTCPPacket1.TCP_NEED_CALCULATE_CHECK_SUM);
-
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    try {
-                        if (outputStreamWriter != null) {
-                            outputStreamWriter.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
             }
         });
@@ -851,613 +799,215 @@ public class GuiForm extends JFrame {
     }
 
     private void addUDPListeners() {
-        buttonUDPSend.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                readIpAndUdpParametersAndGeneratePacket().send();
-            }
-        });
-        buttonUDPCansel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        buttonUDPSend.addActionListener(e -> readIpAndUdpParametersAndGeneratePacket().send());
+        buttonUDPCansel.addActionListener(e -> System.exit(0));
+        buttonUDPOpen.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            fileChooser.showOpenDialog(null);
+            File selectedFile = fileChooser.getSelectedFile();
 
-        buttonUDPOpen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-                fileChooser.showOpenDialog(null);
-                File selectedFile = fileChooser.getSelectedFile();
+            BufferedReader bufferedReader = null;
+            boolean needIp = false;
+            boolean needUdp = false;
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                needUdp = Boolean.parseBoolean(bufferedReader.readLine());
 
-                BufferedReader bufferedReader = null;
-                boolean needIp = false;
-                boolean needUdp = false;
+                System.out.println("[NEED IP]: " + needIp);
+                System.out.println("[NEED UDP]: " + needUdp);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
-                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
-                    needUdp = Boolean.parseBoolean(bufferedReader.readLine());
-
-                    System.out.println("[NEED IP]: " + needIp);
-                    System.out.println("[NEED UDP]: " + needUdp);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (bufferedReader != null) {
+                        bufferedReader.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (bufferedReader != null) {
-                            bufferedReader.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
-                FileInputStream fis = null;
+            }
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(selectedFile);
+                int b;
+                java.util.List<Integer> buffer = new ArrayList<Integer>();
+                while ((b = fis.read()) != -1) {
+                    buffer.add(b);
+                }
+                byte[] byteBuffer = new byte[buffer.size()];
+                for (int i = 0; i < buffer.size(); i++) {
+                    byteBuffer[i] = buffer.get(i).byteValue();
+                }
+                udpPacket = new UDPPacket(byteBuffer.length);
+                udpPacket.setData(byteBuffer);
+                generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
+                updateIpAndUdpFields();
+                if (needUdp) {
+                    textFieldUDPCheckSum.setText("a");
+                }
+                if (needIp) {
+                    textFieldHeaderCheckSum.setText("a");
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    fis = new FileInputStream(selectedFile);
-                    int b;
-                    java.util.List<Integer> buffer = new ArrayList<Integer>();
-                    while ((b = fis.read()) != -1) {
-                        buffer.add(b);
+                    if (fis != null) {
+                        fis.close();
                     }
-                    byte[] byteBuffer = new byte[buffer.size()];
-                    for (int i = 0; i < buffer.size(); i++) {
-                        byteBuffer[i] = buffer.get(i).byteValue();
-                    }
-                    udpPacket = new UDPPacket(byteBuffer.length);
-                    udpPacket.setData(byteBuffer);
-                    generateUDPPacket = new GenerateUDPPacket(udpPacket, DEVICE);
-                    updateIpAndUdpFields();
-                    if (needUdp) {
-                        textFieldUDPCheckSum.setText("a");
-                    }
-                    if (needIp) {
-                        textFieldHeaderCheckSum.setText("a");
-                    }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fis != null) {
-                            fis.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
-
-
             }
         });
 
-        buttonUDPSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FileOutputStream fos = null;
-                GenerateUDPPacket generateUDPPacket1 = readIpAndUdpParametersAndGeneratePacket();
+        buttonUDPSave.addActionListener(e -> {
+            FileOutputStream fos = null;
+            GenerateUDPPacket generateUDPPacket1 = readIpAndUdpParametersAndGeneratePacket();
 
-                byte[] buffer = new byte[generateUDPPacket1.getUdpPacket().size()];
-                generateUDPPacket1.getUdpPacket().getData(buffer);
-                String time = String.valueOf(System.currentTimeMillis());
+            byte[] buffer = new byte[generateUDPPacket1.getUdpPacket().size()];
+            generateUDPPacket1.getUdpPacket().getData(buffer);
+            String time = String.valueOf(System.currentTimeMillis());
+            try {
+                fos = new FileOutputStream(String.valueOf(time) + ".udp");
+                fos.write(buffer);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    fos = new FileOutputStream(String.valueOf(time) + ".udp");
-                    fos.write(buffer);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (fos != null) {
+                        fos.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fos != null) {
-                            fos.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
+            }
 
-                OutputStreamWriter outputStreamWriter = null;
+            OutputStreamWriter outputStreamWriter = null;
+            try {
+                outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".udp.time"));
+                outputStreamWriter.write("" + generateUDPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                outputStreamWriter.write("" + generateUDPPacket1.UDP_NEED_CALCULATE_CHECK_SUM);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".udp.time"));
-                    outputStreamWriter.write("" + generateUDPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
-                    outputStreamWriter.write("" + generateUDPPacket1.UDP_NEED_CALCULATE_CHECK_SUM);
-
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (outputStreamWriter != null) {
+                        outputStreamWriter.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (outputStreamWriter != null) {
-                            outputStreamWriter.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
             }
         });
     }
 
     private void addICMPListeners() {
-        buttonICMPCansel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
-        buttonICMPSend.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                readIpAndIcmpParametersAndGeneratePacket().send();
-            }
-        });
-        buttonICMPOpen.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-                fileChooser.showOpenDialog(null);
-                File selectedFile = fileChooser.getSelectedFile();
+        buttonICMPCansel.addActionListener(e -> System.exit(0));
+        buttonICMPSend.addActionListener(e -> readIpAndIcmpParametersAndGeneratePacket().send());
+        buttonICMPOpen.addActionListener(e -> {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+            fileChooser.showOpenDialog(null);
+            File selectedFile = fileChooser.getSelectedFile();
 
-                BufferedReader bufferedReader = null;
-                boolean needIp = false;
-                boolean needIcmp = false;
+            BufferedReader bufferedReader = null;
+            boolean needIp = false;
+            boolean needIcmp = false;
+            try {
+                bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
+                needIp = Boolean.parseBoolean(bufferedReader.readLine());
+                needIcmp = Boolean.parseBoolean(bufferedReader.readLine());
+
+                System.out.println("[NEED IP]: " + needIp);
+                System.out.println("[NEED ICMP]: " + needIcmp);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(selectedFile + ".time")));
-                    needIp = Boolean.parseBoolean(bufferedReader.readLine());
-                    needIcmp = Boolean.parseBoolean(bufferedReader.readLine());
-
-                    System.out.println("[NEED IP]: " + needIp);
-                    System.out.println("[NEED ICMP]: " + needIcmp);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (bufferedReader != null) {
+                        bufferedReader.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (bufferedReader != null) {
-                            bufferedReader.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
-
-
-                FileInputStream fis = null;
-                try {
-                    fis = new FileInputStream(selectedFile);
-                    int b;
-                    java.util.List<Integer> buffer = new ArrayList<Integer>();
-                    while ((b = fis.read()) != -1) {
-                        buffer.add(b);
-                    }
-                    byte[] byteBuffer = new byte[buffer.size()];
-                    for (int i = 0; i < buffer.size(); i++) {
-                        byteBuffer[i] = buffer.get(i).byteValue();
-                    }
-                    icmpEchoPacket = new ICMPEchoPacket(byteBuffer.length);
-                    icmpEchoPacket.setData(byteBuffer);
-                    generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
-                    updateIpAndIcmpFields();
-                    if (needIcmp) {
-                        textFieldICMPCheckSum.setText("a");
-                    }
-                    if (needIp) {
-                        textFieldHeaderCheckSum.setText("a");
-                    }
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fis != null) {
-                            fis.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-
             }
-        });
-
-        buttonICMPSave.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                FileOutputStream fos = null;
-                GenerateICMPPacket generateICMPPacket1 = readIpAndIcmpParametersAndGeneratePacket();
-
-                byte[] buffer = new byte[generateICMPPacket1.getIcmpEchoPacket().size()];
-                generateICMPPacket1.getIcmpEchoPacket().getData(buffer);
-                String time = String.valueOf(System.currentTimeMillis());
-                try {
-                    fos = new FileOutputStream(time + ".icmp");
-                    fos.write(buffer);
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                } finally {
-                    try {
-                        if (fos != null) {
-                            fos.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(selectedFile);
+                int b;
+                java.util.List<Integer> buffer = new ArrayList<Integer>();
+                while ((b = fis.read()) != -1) {
+                    buffer.add(b);
                 }
-
-                OutputStreamWriter outputStreamWriter = null;
+                byte[] byteBuffer = new byte[buffer.size()];
+                for (int i = 0; i < buffer.size(); i++) {
+                    byteBuffer[i] = buffer.get(i).byteValue();
+                }
+                icmpEchoPacket = new ICMPEchoPacket(byteBuffer.length);
+                icmpEchoPacket.setData(byteBuffer);
+                generateICMPPacket = new GenerateICMPPacket(icmpEchoPacket, DEVICE);
+                updateIpAndIcmpFields();
+                if (needIcmp) {
+                    textFieldICMPCheckSum.setText("a");
+                }
+                if (needIp) {
+                    textFieldHeaderCheckSum.setText("a");
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
                 try {
-                    outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".icmp.time"));
-                    outputStreamWriter.write("" + generateICMPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
-                    outputStreamWriter.write("" + generateICMPPacket1.ICMP_NEED_CALCULATE_CHECK_SUM);
-
-                } catch (FileNotFoundException e1) {
-                    e1.printStackTrace();
+                    if (fis != null) {
+                        fis.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
-                } finally {
-                    try {
-                        if (outputStreamWriter != null) {
-                            outputStreamWriter.close();
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
                 }
             }
         });
 
+        buttonICMPSave.addActionListener(e -> {
+            FileOutputStream fos = null;
+            GenerateICMPPacket generateICMPPacket1 = readIpAndIcmpParametersAndGeneratePacket();
+
+            byte[] buffer = new byte[generateICMPPacket1.getIcmpEchoPacket().size()];
+            generateICMPPacket1.getIcmpEchoPacket().getData(buffer);
+            String time = String.valueOf(System.currentTimeMillis());
+            try {
+                fos = new FileOutputStream(time + ".icmp");
+                fos.write(buffer);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
+                try {
+                    if (fos != null) {
+                        fos.close();
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+            OutputStreamWriter outputStreamWriter = null;
+            try {
+                outputStreamWriter = new OutputStreamWriter(new FileOutputStream(time + ".icmp.time"));
+                outputStreamWriter.write("" + generateICMPPacket1.NEED_CALCULATE_IP_CHECKSUM + "\n");
+                outputStreamWriter.write("" + generateICMPPacket1.ICMP_NEED_CALCULATE_CHECK_SUM);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } finally {
+                try {
+                    if (outputStreamWriter != null) {
+                        outputStreamWriter.close();
+                    }
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
     }
 
-
-    /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
-     *
-     * @noinspection ALL
-     */
-    private void $$$setupUI$$$() {
-        createUIComponents();
-        panelMain = new JPanel();
-        panelMain.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 2, new Insets(15, 15, 15, 15), -1, -1));
-        tabbedPaneTypes = new JTabbedPane();
-        panelMain.add(tabbedPaneTypes, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
-        panelTCP = new JPanel();
-        panelTCP.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPaneTypes.addTab("TCP", panelTCP);
-        panelTCPBottom = new JPanel();
-        panelTCPBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCP.add(panelTCPBottom, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTCPData = new JLabel();
-        labelTCPData.setText("Data");
-        panelTCPBottom.add(labelTCPData, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPBottom.add(textFieldTCPData, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelTCPTop = new JPanel();
-        panelTCPTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCP.add(panelTCPTop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panelTCPLeft = new JPanel();
-        panelTCPLeft.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCPTop.add(panelTCPLeft, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panelTCPHeaderLenght = new JLabel();
-        panelTCPHeaderLenght.setText("Header Lenght");
-        panelTCPLeft.add(panelTCPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPLeft.add(textFieldTCPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTCPSourcePort = new JLabel();
-        labelTCPSourcePort.setText("Source Port");
-        panelTCPLeft.add(labelTCPSourcePort, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPLeft.add(textFieldTCPSourcePort, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelDestinationPort = new JLabel();
-        labelDestinationPort.setText("Destination Port");
-        panelTCPLeft.add(labelDestinationPort, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPLeft.add(textFieldTCPDestinationPort, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTCPCheckSum = new JLabel();
-        labelTCPCheckSum.setText("CheckSum");
-        panelTCPLeft.add(labelTCPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPLeft.add(textFieldTCPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTCPUrgentPointer = new JLabel();
-        labelTCPUrgentPointer.setText("Urgent Pointer");
-        panelTCPLeft.add(labelTCPUrgentPointer, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPLeft.add(textFieldTCPUrgentPointer, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelTCPRigth = new JPanel();
-        panelTCPRigth.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCPTop.add(panelTCPRigth, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panelTCPRightTop = new JPanel();
-        panelTCPRightTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCPRigth.add(panelTCPRightTop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTCPFlags = new JLabel();
-        labelTCPFlags.setText("Flags");
-        panelTCPRightTop.add(labelTCPFlags, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsSYN = new JCheckBox();
-        checkBoxTCPFlagsSYN.setText("SYN");
-        panelTCPRightTop.add(checkBoxTCPFlagsSYN, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsACK = new JCheckBox();
-        checkBoxTCPFlagsACK.setText("ACK");
-        panelTCPRightTop.add(checkBoxTCPFlagsACK, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsFIN = new JCheckBox();
-        checkBoxTCPFlagsFIN.setText("FIN");
-        panelTCPRightTop.add(checkBoxTCPFlagsFIN, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsRST = new JCheckBox();
-        checkBoxTCPFlagsRST.setText("RST");
-        panelTCPRightTop.add(checkBoxTCPFlagsRST, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsPSH = new JCheckBox();
-        checkBoxTCPFlagsPSH.setText("PUSH");
-        panelTCPRightTop.add(checkBoxTCPFlagsPSH, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPFlagsURG = new JCheckBox();
-        checkBoxTCPFlagsURG.setText("URG");
-        panelTCPRightTop.add(checkBoxTCPFlagsURG, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPRigthBottom = new JPanel();
-        panelTCPRigthBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCPRigth.add(panelTCPRigthBottom, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTCPSeq = new JLabel();
-        labelTCPSeq.setText("SEQ");
-        panelTCPRigthBottom.add(labelTCPSeq, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        labelTCPAck = new JLabel();
-        labelTCPAck.setText("ACK");
-        panelTCPRigthBottom.add(labelTCPAck, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPRigthBottom.add(textFieldTCPAck, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTCPWin = new JLabel();
-        labelTCPWin.setText("WIN");
-        panelTCPRigthBottom.add(labelTCPWin, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPRigthBottom.add(textFieldTCPWin, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelTCPRigthBottom.add(textFieldTCPSeq, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        final JPanel panel1 = new JPanel();
-        panel1.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 3, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCPRigth.add(panel1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTCPReserved = new JLabel();
-        labelTCPReserved.setHorizontalAlignment(0);
-        labelTCPReserved.setHorizontalTextPosition(0);
-        labelTCPReserved.setText("Reserved");
-        panel1.add(labelTCPReserved, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 3, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReserved1 = new JCheckBox();
-        checkBoxTCPReserved1.setText("Reserved 1");
-        panel1.add(checkBoxTCPReserved1, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReserved2 = new JCheckBox();
-        checkBoxTCPReserved2.setText("Reserved 2");
-        panel1.add(checkBoxTCPReserved2, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReserved3 = new JCheckBox();
-        checkBoxTCPReserved3.setText("Reserved 3");
-        panel1.add(checkBoxTCPReserved3, new com.intellij.uiDesigner.core.GridConstraints(1, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReserved4 = new JCheckBox();
-        checkBoxTCPReserved4.setText("Reserved 4");
-        panel1.add(checkBoxTCPReserved4, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReservedCWR = new JCheckBox();
-        checkBoxTCPReservedCWR.setText("CWR");
-        panel1.add(checkBoxTCPReservedCWR, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxTCPReservedECE = new JCheckBox();
-        checkBoxTCPReservedECE.setText("ECE");
-        panel1.add(checkBoxTCPReservedECE, new com.intellij.uiDesigner.core.GridConstraints(2, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTCPButtons = new JPanel();
-        panelTCPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
-        panelTCP.add(panelTCPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        buttonTCPSave = new JButton();
-        buttonTCPSave.setText("Safe");
-        panelTCPButtons.add(buttonTCPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonTCPSend = new JButton();
-        buttonTCPSend.setText("Send");
-        panelTCPButtons.add(buttonTCPSend, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonTCPCansel = new JButton();
-        buttonTCPCansel.setText("Cansel");
-        panelTCPButtons.add(buttonTCPCansel, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonTCPOpen = new JButton();
-        buttonTCPOpen.setText("Open");
-        panelTCPButtons.add(buttonTCPOpen, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelUDP = new JPanel();
-        panelUDP.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPaneTypes.addTab("UDP", panelUDP);
-        panelUDPBottom = new JPanel();
-        panelUDPBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelUDP.add(panelUDPBottom, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelUDPData = new JLabel();
-        labelUDPData.setText("Data");
-        panelUDPBottom.add(labelUDPData, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelUDPBottom.add(textFieldUDPData, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelUDPTop = new JPanel();
-        panelUDPTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelUDP.add(panelUDPTop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelUDPSourcePort = new JLabel();
-        labelUDPSourcePort.setText("Source Port");
-        panelUDPTop.add(labelUDPSourcePort, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        labelUDPDestinationPort = new JLabel();
-        labelUDPDestinationPort.setText("Destination Port");
-        panelUDPTop.add(labelUDPDestinationPort, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        labelUDPHeaderLenght = new JLabel();
-        labelUDPHeaderLenght.setText("Header Lenght");
-        panelUDPTop.add(labelUDPHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelUDPTop.add(textFieldUDPSourcePort, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelUDPTop.add(textFieldUDPDestinationPort, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelUDPTop.add(textFieldUDPLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelUDPCheckSum = new JLabel();
-        labelUDPCheckSum.setText("CheckSum");
-        panelUDPTop.add(labelUDPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelUDPTop.add(textFieldUDPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelUDPButtons = new JPanel();
-        panelUDPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
-        panelUDP.add(panelUDPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        buttonUDPSave = new JButton();
-        buttonUDPSave.setText("Safe");
-        panelUDPButtons.add(buttonUDPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonUDPCansel = new JButton();
-        buttonUDPCansel.setText("Cansel");
-        panelUDPButtons.add(buttonUDPCansel, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonUDPSend = new JButton();
-        buttonUDPSend.setText("Send");
-        panelUDPButtons.add(buttonUDPSend, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonUDPOpen = new JButton();
-        buttonUDPOpen.setText("Open");
-        panelUDPButtons.add(buttonUDPOpen, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMP = new JPanel();
-        panelICMP.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        tabbedPaneTypes.addTab("ICMP", panelICMP);
-        panelICMPTop = new JPanel();
-        panelICMPTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(5, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelICMP.add(panelICMPTop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelUICMPType = new JLabel();
-        labelUICMPType.setText("Type");
-        panelICMPTop.add(labelUICMPType, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPTop.add(comboBoxICMPType, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        labelICMPCode = new JLabel();
-        labelICMPCode.setText("Code");
-        panelICMPTop.add(labelICMPCode, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPTop.add(textFieldICMPCode, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelICMPCheckSum = new JLabel();
-        labelICMPCheckSum.setText("CheckSum");
-        panelICMPTop.add(labelICMPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPTop.add(textFieldICMPCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelICMPID = new JLabel();
-        labelICMPID.setText("ID");
-        panelICMPTop.add(labelICMPID, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPTop.add(textFieldICMPID, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelICMPSequence = new JLabel();
-        labelICMPSequence.setText("Sequence");
-        panelICMPTop.add(labelICMPSequence, new com.intellij.uiDesigner.core.GridConstraints(4, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPTop.add(textFieldICMPSequence, new com.intellij.uiDesigner.core.GridConstraints(4, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelICMPBottom = new JPanel();
-        panelICMPBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelICMP.add(panelICMPBottom, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelICMPData = new JLabel();
-        labelICMPData.setText("Data");
-        panelICMPBottom.add(labelICMPData, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelICMPBottom.add(textFieldICMPData, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelICMPButtons = new JPanel();
-        panelICMPButtons.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 4, new Insets(0, 0, 0, 0), -1, -1));
-        panelICMP.add(panelICMPButtons, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        buttonICMPSave = new JButton();
-        buttonICMPSave.setText("Safe");
-        panelICMPButtons.add(buttonICMPSave, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonICMPCansel = new JButton();
-        buttonICMPCansel.setText("Cansel");
-        panelICMPButtons.add(buttonICMPCansel, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonICMPSend = new JButton();
-        buttonICMPSend.setText("Send");
-        panelICMPButtons.add(buttonICMPSend, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        buttonICMPOpen = new JButton();
-        buttonICMPOpen.setText("Open");
-        panelICMPButtons.add(buttonICMPOpen, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainLeft = new JPanel();
-        panelMainLeft.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.add(panelMainLeft, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelVersion = new JLabel();
-        labelVersion.setText("Version");
-        panelMainLeft.add(labelVersion, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainLeft.add(textFieldVersion, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelHeaderLenght = new JLabel();
-        labelHeaderLenght.setText("Header lenght");
-        panelMainLeft.add(labelHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainLeft.add(textFieldHeaderLenght, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTotalLenght = new JLabel();
-        labelTotalLenght.setText("Total lenght");
-        panelMainLeft.add(labelTotalLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainLeft.add(textFieldTotalLenght, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelMainRight = new JPanel();
-        panelMainRight.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(4, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.add(panelMainRight, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelOffset = new JLabel();
-        labelOffset.setText("Offset");
-        panelMainRight.add(labelOffset, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainRight.add(textFieldOffset, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelHeaderCheckSum = new JLabel();
-        labelHeaderCheckSum.setText("Header CheckSum");
-        panelMainRight.add(labelHeaderCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainRight.add(textFieldHeaderCheckSum, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelID = new JLabel();
-        labelID.setText("ID");
-        panelMainRight.add(labelID, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainRight.add(textFieldID, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTTL = new JLabel();
-        labelTTL.setText("TTL");
-        panelMainRight.add(labelTTL, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelMainRight.add(textFieldTTL, new com.intellij.uiDesigner.core.GridConstraints(3, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelTypeOfService = new JPanel();
-        panelTypeOfService.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.add(panelTypeOfService, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panelTypeOfService.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
-        panelTypeTop = new JPanel();
-        panelTypeTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelTypeOfService.add(panelTypeTop, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTypePrecedence = new JLabel();
-        labelTypePrecedence.setText("Precedence");
-        panelTypeTop.add(labelTypePrecedence, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTypeTop.add(textFieldTypePrecedence, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        panelTypeBottom = new JPanel();
-        panelTypeBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 4, new Insets(0, 0, 0, 0), -1, -1));
-        panelTypeOfService.add(panelTypeBottom, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        labelTypeD = new JLabel();
-        labelTypeD.setText("D");
-        panelTypeBottom.add(labelTypeD, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTypeBottom.add(textFieldTypeD, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTypeECN = new JLabel();
-        labelTypeECN.setText("ECN");
-        panelTypeBottom.add(labelTypeECN, new com.intellij.uiDesigner.core.GridConstraints(0, 2, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTypeBottom.add(textFieldTypeECN, new com.intellij.uiDesigner.core.GridConstraints(0, 3, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTypeT = new JLabel();
-        labelTypeT.setText("T");
-        panelTypeBottom.add(labelTypeT, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTypeBottom.add(textFieldTypeT, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        labelTypeR = new JLabel();
-        labelTypeR.setText("R");
-        panelTypeBottom.add(labelTypeR, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelTypeBottom.add(textFieldTypeR, new com.intellij.uiDesigner.core.GridConstraints(2, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        lavelTypeOfService = new JLabel();
-        lavelTypeOfService.setText("Type of Service");
-        panelTypeOfService.add(lavelTypeOfService, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelFlags = new JPanel();
-        panelFlags.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.add(panelFlags, new com.intellij.uiDesigner.core.GridConstraints(1, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        panelFlags.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
-        panelFlagsTop = new JPanel();
-        panelFlagsTop.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelFlags.add(panelFlagsTop, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        final JLabel label1 = new JLabel();
-        label1.setText("Flags");
-        panelFlagsTop.add(label1, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        panelFlagsBottom = new JPanel();
-        panelFlagsBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(3, 1, new Insets(0, 0, 0, 0), -1, -1));
-        panelFlags.add(panelFlagsBottom, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        checkBoxFlagsX = new JCheckBox();
-        checkBoxFlagsX.setText("X (reserved)");
-        panelFlagsBottom.add(checkBoxFlagsX, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxFlagsD = new JCheckBox();
-        checkBoxFlagsD.setText("D");
-        panelFlagsBottom.add(checkBoxFlagsD, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        checkBoxFlagsM = new JCheckBox();
-        checkBoxFlagsM.setText("M");
-        panelFlagsBottom.add(checkBoxFlagsM, new com.intellij.uiDesigner.core.GridConstraints(2, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        paneMainBottom = new JPanel();
-        paneMainBottom.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(1, 2, new Insets(0, 0, 0, 0), -1, -1));
-        panelMain.add(paneMainBottom, new com.intellij.uiDesigner.core.GridConstraints(3, 0, 1, 2, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        paneMainBottom.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), null));
-        paneBottomLeft = new JPanel();
-        paneBottomLeft.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        paneMainBottom.add(paneBottomLeft, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(154, 119), null, 0, false));
-        labelSourceIP = new JLabel();
-        labelSourceIP.setText("Source IP");
-        paneBottomLeft.add(labelSourceIP, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        paneBottomLeft.add(textFieldSourceIP, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-        paneBottomRight = new JPanel();
-        paneBottomRight.setLayout(new com.intellij.uiDesigner.core.GridLayoutManager(2, 1, new Insets(0, 0, 0, 0), -1, -1));
-        paneMainBottom.add(paneBottomRight, new com.intellij.uiDesigner.core.GridConstraints(0, 1, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_BOTH, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_SHRINK | com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(486, 119), null, 0, false));
-        labelDestinationIP = new JLabel();
-        labelDestinationIP.setText("Destination IP");
-        paneBottomRight.add(labelDestinationIP, new com.intellij.uiDesigner.core.GridConstraints(0, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_CENTER, com.intellij.uiDesigner.core.GridConstraints.FILL_NONE, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        paneBottomRight.add(textFieldDestinationIP, new com.intellij.uiDesigner.core.GridConstraints(1, 0, 1, 1, com.intellij.uiDesigner.core.GridConstraints.ANCHOR_WEST, com.intellij.uiDesigner.core.GridConstraints.FILL_HORIZONTAL, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_WANT_GROW, com.intellij.uiDesigner.core.GridConstraints.SIZEPOLICY_FIXED, null, new Dimension(150, -1), null, 0, false));
-    }
-
-    /**
-     * @noinspection ALL
-     */
-    public JComponent $$$getRootComponent$$$() {
-        return panelMain;
-    }
 }
