@@ -59,9 +59,8 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
 
     @Override
     public void send() {
-        byte[] bufferWithEthernet = getBufferWithEthernet();
+        byte[] bufferWithEthernet = getBufferWithEthernet(tcpPacket);
         JPacket packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
-
 
         if (NEED_CALCULATE_IP_CHECKSUM) {
             Pattern pattern = Pattern.compile("Ip:.*?checksum = [0-9A-Zx]+ \\([0-9]+\\) \\[incorrect: [0-9A-Zx]+");
@@ -71,7 +70,7 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
                 System.out.println("[FIND IP CHECKSUM]: " + newIPCheckSum);
 
                 tcpPacket.setIPCheckSum(Integer.parseInt(newIPCheckSum, 16));
-                bufferWithEthernet = getBufferWithEthernet();
+                bufferWithEthernet = getBufferWithEthernet(tcpPacket);
                 packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
             }
         }
@@ -84,54 +83,17 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
                 System.out.println("[FIND TCP CHECKSUM]: " + newIPCheckSum);
 
                 tcpPacket.setTCPCheckSum(Integer.parseInt(newIPCheckSum, 16));
-                bufferWithEthernet = getBufferWithEthernet();
+                bufferWithEthernet = getBufferWithEthernet(tcpPacket);
                 packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
             }
         }
 
-
-        Ip4 ip4 = packet.getHeader(new Ip4());
-        Tcp tcp = packet.getHeader(new Tcp());
+        packet.getHeader(new Ip4());
+        packet.getHeader(new Tcp());
         packet.scan(Ethernet.ID);
 
         System.out.println(pcap.sendPacket(ByteBuffer.wrap(packet.getByteArray(0, packet.size()))));
         System.out.println(packet);
-    }
-
-
-    private void computeMacAddresses() {
-        try {
-            byte[] macAddress = GetMacAddressByIpAddress.getMacAddress(InetAddress.getByAddress(SOURCE_ADDRESS));
-            if (macAddress != null) {
-                SOURCE_MAC_ADDRESS = macAddress;
-            }
-            macAddress = GetMacAddressByIpAddress.getMacAddress(InetAddress.getByAddress(DESTINATION_ADDRESS));
-            if (macAddress != null) {
-                DESTINATION_MAC_ADDRESS = macAddress;
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private byte[] getBufferWithEthernet() {
-        computeMacAddresses();
-
-        byte[] buffer = new byte[tcpPacket.size()];
-        byte[] bufferWithEthernet = new byte[tcpPacket.size() + 14];
-        tcpPacket.getData(buffer);
-
-        System.arraycopy(DESTINATION_MAC_ADDRESS, 0, bufferWithEthernet, 0, DESTINATION_MAC_ADDRESS.length);
-        System.arraycopy(SOURCE_MAC_ADDRESS, 0, bufferWithEthernet, DESTINATION_MAC_ADDRESS.length, SOURCE_MAC_ADDRESS.length);
-
-        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length] = 0x08;
-        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length + 1] = 0x00;
-
-        System.arraycopy(buffer, 0, bufferWithEthernet, 2 * SOURCE_MAC_ADDRESS.length + 2, buffer.length);
-
-        System.out.println("[BUFFER WITH ETHERNET]: " + Arrays.toString(bufferWithEthernet));
-        System.out.println("[BUFFER]: " + Arrays.toString(buffer));
-        return bufferWithEthernet;
     }
 
     public void generate() {
@@ -139,8 +101,6 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
         tcpPacket = (TCPPacket) pack;
 
         tcpPacket.setProtocol(IPPacket.PROTOCOL_TCP);
-
-//        tcpPacket.setTCPDataByteLength(TCP_DATA.length);
 
         tcpPacket.setTCPHeaderLength(TCP_HEADER_LENGTH);
 
@@ -161,7 +121,6 @@ public class GenerateTCPPacket extends GenerateIPPacket implements Serializable 
         } else {
             tcpPacket.setTCPCheckSum(TCP_CHECKSUM);
         }
-
 
         byte[] buffer = new byte[tcpPacket.size()];
         tcpPacket.getData(buffer);

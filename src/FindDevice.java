@@ -5,13 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Olga on 31.10.14.
+ * Created by olgaoskina
+ * 03 February 2015
  */
 public class FindDevice {
-    StringBuilder errors = new StringBuilder();
+    private final StringBuilder errors = new StringBuilder();
+    private final static FindDevice INSTANCE = new FindDevice();
 
-    public FindDevice() {
+    private FindDevice() {
+    }
 
+    public static FindDevice getInstance() {
+        return INSTANCE;
     }
 
     public List<PcapIf> findAllDevices() {
@@ -19,5 +24,4 @@ public class FindDevice {
         Pcap.findAllDevs(devices, errors);
         return devices;
     }
-
 }

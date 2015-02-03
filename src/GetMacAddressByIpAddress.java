@@ -1,38 +1,35 @@
-import org.omg.SendingContext.RunTime;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Olga on 10.01.15.
+ * Created by olgaoskina
+ * 03 February 2015
  */
 public class GetMacAddressByIpAddress {
+
+    private final static GetMacAddressByIpAddress INSTANCE = new GetMacAddressByIpAddress();
 
     private GetMacAddressByIpAddress() {
     }
 
-    public static byte[] getMacAddress(String ipAddress) {
+    public static GetMacAddressByIpAddress getInstance() {
+        return INSTANCE;
+    }
+
+    public byte[] getMacAddress(String ipAddress) {
         try {
             Process process = Runtime.getRuntime().exec(new String[]{"arp", "-a", ipAddress});
-            InputStreamReader inputStreamReader = new InputStreamReader(process.getInputStream());
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            StringBuilder answ = new StringBuilder();
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                answ.append(line).append("\n");
-            }
-
             Pattern pattern = Pattern.compile(ipAddress + ".*?[0-9a-z-]+");
-            Matcher matcher = pattern.matcher(answ.toString());
+            Matcher matcher = pattern.matcher(getAnswer(process));
             if (matcher.find()) {
                 String macAddress = matcher.group().replaceFirst("^" + ipAddress + "[^0-9a-z-]+", "");
-                System.out.println("[MAC ADDRESS]: " + macAddress);
                 return parseMacAddress(macAddress);
             } else {
-                return Main.SOURCE_IP_ADDRESS;
+                return Main.getSourceIpAddress();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,11 +37,25 @@ public class GetMacAddressByIpAddress {
         return null;
     }
 
-    public static byte[] getMacAddress(InetAddress ipAddress) {
+    public byte[] getMacAddress(InetAddress ipAddress) {
         return getMacAddress(ipAddress.getHostAddress());
     }
 
-    public static byte[] parseMacAddress(String macAddress) {
+    private String getAnswer(Process process) {
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        StringBuilder answer = new StringBuilder();
+        String line;
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                answer.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return answer.toString();
+    }
+
+    private byte[] parseMacAddress(String macAddress) {
         String[] hexAddress = macAddress.split("-");
         byte[] byteAddress = new byte[hexAddress.length];
         for (int i = 0; i < hexAddress.length; i++) {
@@ -52,5 +63,4 @@ public class GetMacAddressByIpAddress {
         }
         return byteAddress;
     }
-
 }

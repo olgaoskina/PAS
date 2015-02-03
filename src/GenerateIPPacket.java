@@ -1,11 +1,4 @@
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.jnetpcap.Pcap;
-import org.jnetpcap.packet.JMemoryPacket;
-import org.jnetpcap.packet.JPacket;
-import org.jnetpcap.protocol.JProtocol;
-import org.jnetpcap.protocol.lan.Ethernet;
-import org.jnetpcap.protocol.network.Ip4;
-import org.jnetpcap.protocol.tcpip.Tcp;
 import org.savarese.vserv.tcpip.IPPacket;
 
 import java.math.BigInteger;
@@ -13,11 +6,10 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * Created by Olga on 11.12.14.
+ * Created by olgaoskina
+ * 03 February 2015
  */
 abstract public class GenerateIPPacket {
     protected int TOS_PRECEDENCE = 0;
@@ -41,9 +33,9 @@ abstract public class GenerateIPPacket {
     protected boolean CALCULATE_CHECKSUM = false;
     protected IPPacket pack;
 
-    protected String SELECTED_DEVICE = "\\Device\\NPF_{A7C70EAE-F31D-44EE-B8AD-6A71B237CBBF}";
-    protected byte[] SOURCE_MAC_ADDRESS = new byte[]{8, 0, 39, 83, -15, -78};
-    protected byte[] DESTINATION_MAC_ADDRESS = new byte[]{8, 0, 39, 83, -15, -78};
+    protected String SELECTED_DEVICE;
+    protected byte[] SOURCE_MAC_ADDRESS;
+    protected byte[] DESTINATION_MAC_ADDRESS;
     protected Pcap pcap;
 
     abstract public void send();
@@ -51,7 +43,32 @@ abstract public class GenerateIPPacket {
     public GenerateIPPacket(IPPacket pack, String device) {
         SELECTED_DEVICE = device;
         this.pack = pack;
-        pcap = Pcap.openLive(SELECTED_DEVICE, Pcap.DEFAULT_SNAPLEN, Pcap.MODE_PROMISCUOUS, Pcap.DEFAULT_TIMEOUT, new StringBuilder());
+        pcap = Pcap.openLive(
+                SELECTED_DEVICE,
+                Pcap.DEFAULT_SNAPLEN,
+                Pcap.MODE_PROMISCUOUS,
+                Pcap.DEFAULT_TIMEOUT,
+                new StringBuilder()
+        );
+    }
+
+    protected void computeMacAddresses() {
+        try {
+            byte[] macAddress = GetMacAddressByIpAddress.getInstance().getMacAddress(
+                    InetAddress.getByAddress(SOURCE_ADDRESS)
+            );
+            if (macAddress != null) {
+                SOURCE_MAC_ADDRESS = macAddress;
+            }
+            macAddress = GetMacAddressByIpAddress.getInstance().getMacAddress(
+                    InetAddress.getByAddress(DESTINATION_ADDRESS)
+            );
+            if (macAddress != null) {
+                DESTINATION_MAC_ADDRESS = macAddress;
+            }
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     public void generate() {
@@ -75,12 +92,28 @@ abstract public class GenerateIPPacket {
 
         if (NEED_CALCULATE_IP_CHECKSUM) {
             pack.computeIPChecksum(true);
-
-//            System.out.println(pack.toString().matches("checksum = [0-9A-Zx]+ \\([0-9]+\\) \\[incorrect: \\]"));
         } else {
             pack.setIPCheckSum(IP_CHECK_SUM);
         }
+    }
 
+    public byte[] getBufferWithEthernet(IPPacket packet) {
+        computeMacAddresses();
+        byte[] buffer = new byte[packet.size()];
+        byte[] bufferWithEthernet = new byte[packet.size() + 14];
+        packet.getData(buffer);
+
+        System.arraycopy(DESTINATION_MAC_ADDRESS, 0, bufferWithEthernet, 0, DESTINATION_ADDRESS.length);
+        System.arraycopy(SOURCE_MAC_ADDRESS, 0, bufferWithEthernet, DESTINATION_ADDRESS.length, SOURCE_MAC_ADDRESS.length);
+
+        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length] = 0x08;
+        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length + 1] = 0x00;
+
+        System.arraycopy(buffer, 0, bufferWithEthernet, 2 * SOURCE_MAC_ADDRESS.length + 2, buffer.length);
+
+        System.out.println("[BUFFER WITH ETHERNET]: " + Arrays.toString(bufferWithEthernet));
+        System.out.println("[BUFFER]: " + Arrays.toString(buffer));
+        return bufferWithEthernet;
     }
 
     public void setNeedCalculateIPCheckSum(boolean needCalculateIPCheckSum) {
@@ -113,10 +146,8 @@ abstract public class GenerateIPPacket {
     }
 
     public void setVersion(int version) {
-        if (version == 4 || version == 6) {
-            VERSION |= version;
-            System.out.println("[SET VERSION]: " + BigInteger.valueOf(VERSION).toString(2));
-        }
+        VERSION |= version;
+        System.out.println("[SET VERSION]: " + BigInteger.valueOf(VERSION).toString(2));
     }
 
     public void setHeaderLength(int length) {
@@ -193,5 +224,4 @@ abstract public class GenerateIPPacket {
         CALCULATE_CHECKSUM = calculateCheckSum;
         System.out.println("[SET CALCULATE CHECK SUM]:" + CALCULATE_CHECKSUM);
     }
-
 }

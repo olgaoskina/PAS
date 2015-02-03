@@ -4,13 +4,17 @@
  */
 public class Main {
 
-    public static byte[] SOURCE_IP_ADDRESS;
+    private static byte[] sourceIpAddress;
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
         new Info();
-		SelectDevice selectDevice = new SelectDevice();
-        String device = selectDevice.getSelectDevice();
-        SOURCE_IP_ADDRESS = selectDevice.getMacAddress();
-        GuiForm guiForm = new GuiForm(device);
-	}
+        SelectDevice selectDevice = new SelectDevice();
+        String device = selectDevice.getSelectedDevice();
+        sourceIpAddress = selectDevice.getMacAddress();
+        new GuiForm(device);
+    }
+
+    public static byte[] getSourceIpAddress() {
+        return sourceIpAddress;
+    }
 }

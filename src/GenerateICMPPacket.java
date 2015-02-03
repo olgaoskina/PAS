@@ -4,21 +4,18 @@ import org.jnetpcap.protocol.JProtocol;
 import org.jnetpcap.protocol.lan.Ethernet;
 import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;
-import org.jnetpcap.protocol.tcpip.Udp;
 import org.savarese.vserv.tcpip.ICMPEchoPacket;
-import org.savarese.vserv.tcpip.IPPacket;
 import org.savarese.vserv.tcpip.ICMPPacket;
+import org.savarese.vserv.tcpip.IPPacket;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by Olga
- * 24 December 2014.
+ * Created by olgaoskina
+ * 03 February 2015
  */
 public class GenerateICMPPacket extends GenerateIPPacket {
 
@@ -39,10 +36,9 @@ public class GenerateICMPPacket extends GenerateIPPacket {
         super(pack, device);
     }
 
-
     @Override
     public void send() {
-        byte[] bufferWithEthernet = getBufferWithEthernet();
+        byte[] bufferWithEthernet = getBufferWithEthernet(icmpEchoPacket);
         JPacket packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
 
         if (NEED_CALCULATE_IP_CHECKSUM) {
@@ -53,7 +49,7 @@ public class GenerateICMPPacket extends GenerateIPPacket {
                 System.out.println("[FIND IP CHECKSUM]: " + newIPCheckSum);
 
                 icmpEchoPacket.setIPCheckSum(Integer.parseInt(newIPCheckSum, 16));
-                bufferWithEthernet = getBufferWithEthernet();
+                bufferWithEthernet = getBufferWithEthernet(icmpEchoPacket);
                 packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
             }
         }
@@ -66,52 +62,18 @@ public class GenerateICMPPacket extends GenerateIPPacket {
                 System.out.println("[FIND TCP CHECKSUM]: " + newIPCheckSum);
 
                 icmpEchoPacket.setICMPCheckSum(Integer.parseInt(newIPCheckSum, 16));
-                bufferWithEthernet = getBufferWithEthernet();
+                bufferWithEthernet = getBufferWithEthernet(icmpEchoPacket);
                 packet = new JMemoryPacket(JProtocol.ETHERNET_ID, bufferWithEthernet);
             }
         }
-        Ip4 ip4 = packet.getHeader(new Ip4());
-        Icmp icmp = packet.getHeader(new Icmp());
+        packet.getHeader(new Ip4());
+        packet.getHeader(new Icmp());
         packet.scan(Ethernet.ID);
 
         System.out.println(pcap.sendPacket(ByteBuffer.wrap(packet.getByteArray(0, packet.size()))));
         System.out.println(packet);
     }
 
-    private void computeMacAddresses() {
-        try {
-            byte[] macAddress = GetMacAddressByIpAddress.getMacAddress(InetAddress.getByAddress(SOURCE_ADDRESS));
-            if (macAddress != null) {
-                SOURCE_MAC_ADDRESS = macAddress;
-            }
-            macAddress = GetMacAddressByIpAddress.getMacAddress(InetAddress.getByAddress(DESTINATION_ADDRESS));
-            if (macAddress != null) {
-                DESTINATION_MAC_ADDRESS = macAddress;
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private byte[] getBufferWithEthernet() {
-        computeMacAddresses();
-
-        byte[] buffer = new byte[icmpEchoPacket.size()];
-        byte[] bufferWithEthernet = new byte[icmpEchoPacket.size() + 14];
-        icmpEchoPacket.getData(buffer);
-
-        System.arraycopy(DESTINATION_MAC_ADDRESS, 0, bufferWithEthernet, 0, DESTINATION_MAC_ADDRESS.length);
-        System.arraycopy(SOURCE_MAC_ADDRESS, 0, bufferWithEthernet, DESTINATION_MAC_ADDRESS.length, SOURCE_MAC_ADDRESS.length);
-
-        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length] = 0x08;
-        bufferWithEthernet[2 * SOURCE_MAC_ADDRESS.length + 1] = 0x00;
-
-        System.arraycopy(buffer, 0, bufferWithEthernet, 2 * SOURCE_MAC_ADDRESS.length + 2, buffer.length);
-
-        System.out.println("[BUFFER WITH ETHERNET]: " + Arrays.toString(bufferWithEthernet));
-        System.out.println("[BUFFER]: " + Arrays.toString(buffer));
-        return bufferWithEthernet;
-    }
     public void generate() {
         super.generate();
         icmpEchoPacket = (ICMPEchoPacket) pack;
@@ -122,7 +84,6 @@ public class GenerateICMPPacket extends GenerateIPPacket {
         icmpEchoPacket.setType(ICMP_TYPE);
         icmpEchoPacket.setSequenceNumber(ICMP_SEQ_NUMBER);
 
-
         if (ICMP_NEED_CALCULATE_CHECK_SUM) {
             icmpEchoPacket.computeICMPChecksum(true);
         } else {
@@ -131,8 +92,7 @@ public class GenerateICMPPacket extends GenerateIPPacket {
 
         byte[] buffer = new byte[icmpEchoPacket.size()];
         icmpEchoPacket.getData(buffer);
-        System.out.println("[ICMP DATA]: " + Arrays.toString(ICMP_DATA));
-        System.arraycopy(ICMP_DATA, 0, buffer, 4 * HEADER_LENGTH + 4 * icmpEchoPacket.getICMPHeaderByteLength() - 6*4, ICMP_DATA.length);
+        System.arraycopy(ICMP_DATA, 0, buffer, 4 * HEADER_LENGTH + 4 * icmpEchoPacket.getICMPHeaderByteLength() - 6 * 4, ICMP_DATA.length);
         icmpEchoPacket.setData(buffer);
 
         byte[] array = new byte[icmpEchoPacket.size()];

@@ -4,36 +4,47 @@ import javax.swing.*;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Created by olgaoskina
+ * 03 February 2015
+ */
 public class SelectDevice {
     private JPanel panel;
-    private String selectDevice;
+    private String selectedDevice;
     private List<PcapIf> allDevices;
-    private byte[] MAC_ADDRESS;
+    private byte[] macAddress;
 
     public SelectDevice() {
         panel = new JPanel();
-        allDevices= new FindDevice().findAllDevices();
+        allDevices = FindDevice.getInstance().findAllDevices();
         createWindow();
-        showWindow();
-        closeWindow();
+        panel.setVisible(true);
+        panel.setVisible(false);
     }
 
     private void createWindow() {
-        panel.add(new JLabel("Please select a device:"));
         DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
 
-        for (PcapIf device: allDevices) {
+        for (PcapIf device : allDevices) {
             model.addElement(device.getName());
         }
-        JComboBox comboBox = new JComboBox<String>(model);
+
+        JComboBox comboBox = new JComboBox<>(model);
+        panel.add(new JLabel("Please select a device:"));
         panel.add(comboBox);
 
-        int result = JOptionPane.showConfirmDialog(null, panel, "Devices", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                panel,
+                "Devices",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+        );
         if (result == JOptionPane.OK_OPTION) {
-            selectDevice = (String) comboBox.getSelectedItem();
+            selectedDevice = (String) comboBox.getSelectedItem();
 
             try {
-                MAC_ADDRESS = allDevices.get(comboBox.getSelectedIndex()).getHardwareAddress();
+                macAddress = allDevices.get(comboBox.getSelectedIndex()).getHardwareAddress();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -41,22 +52,13 @@ public class SelectDevice {
         if (result == JOptionPane.CANCEL_OPTION) {
             System.exit(0);
         }
-
     }
 
-    public String getSelectDevice() {
-        return selectDevice;
-    }
-
-    private void showWindow() {
-        panel.setVisible(true);
-    }
-
-    private void closeWindow() {
-        panel.setVisible(false);
+    public String getSelectedDevice() {
+        return selectedDevice;
     }
 
     public byte[] getMacAddress() {
-        return MAC_ADDRESS;
+        return macAddress;
     }
 }
